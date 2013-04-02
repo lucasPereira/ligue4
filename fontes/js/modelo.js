@@ -17,18 +17,27 @@
 			var jogadaRealizada = this.tabuleiro.receberJogada(coluna, jogadorDaVez);
 			if (jogadaRealizada) {
 				if (this.tabuleiro.possuiSequenciaVencedora()) {
-					//TODO: Vencedor
-					alert("Vencedor");
+					Ligue4.instancia.declararVencedor(this.tabuleiro.fornecerSequenciasVencedoras());
 				} else if (this.tabuleiro.fimDeCelulas()) {
-						//TODO: Fim de célula
-						alert("Empate");
+					Ligue4.instancia.declararEmpate();
 				}
 				this.ordemDeJogadores.push(this.ordemDeJogadores.shift());
 			} else {
-				//TODO Fim de coluna
-				alert("Coluna cheia");
+				Ligue4.instancia.declararColunaCheia();
 			}
 			return jogadaRealizada;
+		},
+		
+		humanoPodeJogar: function () {
+			return (this.ordemDeJogadores.primeiro().igual(this.jogadores.humano) && this.podeJogar());
+		},
+		
+		computadorPodeJogar: function () {
+			return (this.ordemDeJogadores.primeiro().igual(this.jogadores.computador) && this.podeJogar());
+		},
+		
+		podeJogar: function () {
+			return !(this.tabuleiro.possuiSequenciaVencedora() || this.tabuleiro.fimDeCelulas());
 		}
 	});
 	
@@ -57,7 +66,7 @@
 			var celulaLivre = null;
 			var celulaAtual = this.fornecerPrimeiraCelulaDeBaixoNaColuna(indiceDaColuna);
 			while (celulaAtual.ocupada() && celulaAtual.dentroDoTabuleiro()) {
-				celulaAtual = celulaAtual.fornecerAdjacenteCima();
+				celulaAtual = celulaAtual.fornecerAdjacenteTopo();
 			}
 			var jogadaPossivel = (celulaAtual.livre() && celulaAtual.dentroDoTabuleiro());
 			if (jogadaPossivel) {
@@ -85,6 +94,14 @@
 		
 		verificarSequenciaVencedora: function (ultimaCelulaOcupada) {
 			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.verificarSequenciasVencedoras());
+			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteTopo().verificarSequenciasVencedoras());
+			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteFundo().verificarSequenciasVencedoras());
+			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteEsquerda().verificarSequenciasVencedoras());
+			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteDireita().verificarSequenciasVencedoras());
+			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteTopoEsquerda().verificarSequenciasVencedoras());
+			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteTopoDireita().verificarSequenciasVencedoras());
+			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteFundoEsquerda().verificarSequenciasVencedoras());
+			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteFundoDireita().verificarSequenciasVencedoras());
 		},
 		
 		possuiSequenciaVencedora: function () {
@@ -132,14 +149,14 @@
 			var quantidadeDeLigacoes = this.tabuleiro.quantidadeDeLigacoes;
 			var sequenciasDeVitoria = [];
 			var sequenciasVencedoras = [];
-			sequenciasDeVitoria.push(this.fornecerAdjacentesVerticalCima(quantidadeDeLigacoes));
-			sequenciasDeVitoria.push(this.fornecerAdjacentesVerticalBaixo(quantidadeDeLigacoes))
+			sequenciasDeVitoria.push(this.fornecerAdjacentesVerticalTopo(quantidadeDeLigacoes));
+			sequenciasDeVitoria.push(this.fornecerAdjacentesVerticalFundo(quantidadeDeLigacoes))
 			sequenciasDeVitoria.push(this.fornecerAdjacentesHorizontalEsquerda(quantidadeDeLigacoes));
 			sequenciasDeVitoria.push(this.fornecerAdjacentesHorizontalDireita(quantidadeDeLigacoes));
-			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalCimaEsquerda(quantidadeDeLigacoes));
-			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalCimaDireita(quantidadeDeLigacoes));
-			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalBaixoEsquerda(quantidadeDeLigacoes));
-			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalBaixoDireita(quantidadeDeLigacoes));
+			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalTopoEsquerda(quantidadeDeLigacoes));
+			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalTopoDireita(quantidadeDeLigacoes));
+			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalFundoEsquerda(quantidadeDeLigacoes));
+			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalFundoDireita(quantidadeDeLigacoes));
 			sequenciasDeVitoria.paraCada(function (sequenciaDeVitoria) {
 				if (this.verificarSequenciaVencedora(sequenciaDeVitoria)) {
 					sequenciaDeVitoria.unshift(this);
@@ -160,11 +177,11 @@
 			return (possuiVencedora && (sequencia.length >= this.tabuleiro.quantidadeDeLigacoes));
 		},
 		
-		fornecerAdjacenteCima: function () {
+		fornecerAdjacenteTopo: function () {
 			return this.fornecerAdjacentes(-1, 0 ,1, true).primeiro();
 		},
 		
-		fornecerAdjacenteBaixo: function () {
+		fornecerAdjacenteFundo: function () {
 			return this.fornecerAdjacentes(1, 0 ,1, true).primeiro();
 		},
 		
@@ -175,12 +192,28 @@
 		fornecerAdjacenteDireita: function () {
 			return this.fornecerAdjacentes(0, 1 ,1, true).primeiro();
 		},
+
+		fornecerAdjacenteTopoEsquerda: function () {
+			return this.fornecerAdjacentes(-1, -1 ,1, true).primeiro();
+		},
 		
-		fornecerAdjacentesVerticalCima: function (quantidade) {
+		fornecerAdjacenteTopoDireita: function () {
+			return this.fornecerAdjacentes(-1, 1 ,1, true).primeiro();
+		},
+		
+		fornecerAdjacenteFundoEsquerda: function () {
+			return this.fornecerAdjacentes(1, -1 ,1, true).primeiro();
+		},
+		
+		fornecerAdjacenteFundoDireita: function () {
+			return this.fornecerAdjacentes(1, 1 ,1, true).primeiro();
+		},
+		
+		fornecerAdjacentesVerticalTopo: function (quantidade) {
 			return this.fornecerAdjacentes(-1, 0, quantidade, false);
 		},
 		
-		fornecerAdjacentesVerticalBaixo: function (quantidade) {
+		fornecerAdjacentesVerticalFundo: function (quantidade) {
 			return this.fornecerAdjacentes(1, 0, quantidade, false);
 		},
 		
@@ -192,19 +225,19 @@
 			return this.fornecerAdjacentes(0, 1, quantidade, false);
 		},
 		
-		fornecerAdjacentesDiagonalCimaEsquerda: function (quantidade) {
+		fornecerAdjacentesDiagonalTopoEsquerda: function (quantidade) {
 			return this.fornecerAdjacentes(-1, -1, quantidade, false);
 		},
 		
-		fornecerAdjacentesDiagonalCimaDireita: function (quantidade) {
+		fornecerAdjacentesDiagonalTopoDireita: function (quantidade) {
 			return this.fornecerAdjacentes(-1, 1, quantidade, false);
 		},
 		
-		fornecerAdjacentesDiagonalBaixoEsquerda: function (quantidade) {
+		fornecerAdjacentesDiagonalFundoEsquerda: function (quantidade) {
 			return this.fornecerAdjacentes(1, -1, quantidade, false);
 		},
 		
-		fornecerAdjacentesDiagonalBaixoDireita: function (quantidade) {
+		fornecerAdjacentesDiagonalFundoDireita: function (quantidade) {
 			return this.fornecerAdjacentes(1, 1, quantidade, false);
 		},
 		

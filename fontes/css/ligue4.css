@@ -1,25 +1,43 @@
 @charset "utf-8";
 
+html,
+body {
+	height: 100%;
+}
+
+body {
+	padding: 20px;
+	background-image: -webkit-radial-gradient(center, circle, #FFF, #EEE);
+}
+
+section.jogo {
+	display: -webkit-flex;
+	-webkit-flex-direction: row;
+	-webkit-flex-wrap: nowrap;
+	-webkit-align-items: flex-start;
+	-webkit-justify-content: center;
+}
+
 table.tabuleiro {
 	border-collapse: separate;
 	border-spacing: 0.5px;
+	height: 400px;
 	table-layout: fixed;
 	width: 400px;
-	height: 400px;
 }
 
 table.tabuleiro tr:nth-of-type(odd) td:nth-of-type(even),
 table.tabuleiro tr:nth-of-type(even) td:nth-of-type(odd) {
-	background-color: #EEE;
+	background-color: #D5D5D5;
 }
 
 table.tabuleiro tr:nth-of-type(odd) td:nth-of-type(odd),
 table.tabuleiro tr:nth-of-type(even) td:nth-of-type(even) {
-	background-color: #E5E5E5;
+	background-color: #DDD;
 }
 
 table.tabuleiro tr td {
-	border-radius: 1em;
+	border-radius: 1.2em;
 	color: #333;
 	text-align: center;
 	vertical-align: middle;
@@ -27,10 +45,11 @@ table.tabuleiro tr td {
 
 table.tabuleiro tr td:hover {
 	transition-property: all;
-	transition-duration: 1s;
+	transition-duration: 0.6s;
 	transition-timing-function: linear;
 	transition-delay: 0;
-	background-color: #DDD;
+	background-color: #AAA !important;
+	cursor: pointer;
 }
 
 table.tabuleiro tr td.humano {
@@ -43,4 +62,47 @@ table.tabuleiro tr td.computador {
 	background-color: rgb(73, 172, 73) !important;
 	background-image: -webkit-linear-gradient(270deg, rgb(73, 172, 73) 50%, rgba(255, 255, 255, 0.1) 50%);
 	color: #FFF;
+}
+
+ul.jogadores {
+	margin-left: 30px;
+	width: 100px;
+}
+
+ul.jogadores > li.humano {
+	border-color: rgb(88, 61, 136);
+}
+
+ul.jogadores > li.computador {
+	border-color: rgb(73, 172, 73);
+}
+
+ul.jogadores > li {
+	border-style: solid;
+	border-width: 0 0 0 20px;
+	margin-top: 5px;
+	padding-left: 5px;
+}
+
+ul.jogadores > li.jogadorDaVez {
+	font-weight: bold;
+}
+
+section.mensagem {
+	margin-bottom: 30px;
+}
+
+section.mensagem > p.mensagem {
+	border-radius: 0.5em;
+	background-color: #444;
+	background-image: -webkit-radial-gradient(center, circle, #888, #555);
+	color: #FFF;
+	margin: auto;
+	text-align: center;
+	padding: 10px;
+	width: 700px;
+}
+
+section.mensagem > p.mensagem:hover {
+	cursor: pointer;
 }
