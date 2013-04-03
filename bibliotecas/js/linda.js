@@ -1,71 +1,19 @@
-/*jshint
-	bitwise: true,
-	camelcase: true,
-	curly: true,
-	eqeqeq: true,
-	forin: true,
-	immed: true,
-	latedef: true,
-	newcap: true,
-	noarg: true,
-	noempty: true,
-	nonew: false,
-	plusplus: false,
-	quotmark: "double",
-	regexp: true,
-	undef: true,
-	unused: true,
-	strict: true,
-	trailing: true,
-	indent: 4,
-	maxparams: 3,
-	maxdepth: 2,
-	maxstatements: 10,
-	maxcomplexity: 3,
-	maxlen: 128
-	asi: false,
-	boss: false,
-	debug: false,
-	eqnull: false,
-	es5: false,
-	esnext: false,
-	evil: false,
-	expr: false,
-	globalstrict: false,
-	funcscope: false,
-	iterator: false,
-	lastsemic: false,
-	laxbreak: false,
-	laxcomma: false,
-	loopfunc: false,
-	multistr: false,
-	onecase: false,
-	proto: false,
-	regexdash: false,
-	scripturl: false,
-	smarttabs: false,
-	shadow: false,
-	sub: false,
-	supernew: false,
-	browser: true
-*/
-
 (function (global) {
 	"use strict";
-	
+
 	var ExcecaoLinda = function (mensagem) {
 		this.mensagem = mensagem;
 		this.message = mensagem;
 	};
-	
+
 	ExcecaoLinda.prototype.comoTexto = function () {
 		return "ExcecaoLinda: " + this.mensagem;
 	};
-	
+
 	ExcecaoLinda.prototype.toString = function () {
 		return this.comoTexto();
 	};
-	
+
 	var Linda = {
 		documento: document,
 		janela: window,
@@ -73,7 +21,7 @@
 		localizacao: window.location,
 		performance: window.performance,
 		global: global,
-		
+
 		propriedadesDeAtributos: {
 			configuravel: false,
 			enumeravel: false,
@@ -82,7 +30,7 @@
 			funcaoFixar: undefined,
 			valor: undefined
 		},
-		
+
 		propriedadesDeAtributosGravaveis: {
 			configuravel: false,
 			enumeravel: false,
@@ -91,7 +39,7 @@
 			funcaoFixar: undefined,
 			valor: undefined
 		},
-		
+
 		tipos: {
 			OBJETO: "object",
 			FUNCAO: "function",
@@ -100,18 +48,18 @@
 			BOOLEANO: "boolean",
 			INDEFINIDO: "undefined"
 		},
-		
+
 		fornecerPrototipoDe: function (objeto) {
 			return Object.getPrototypeOf(objeto);
 		},
-		
+
 		instanciaDe: function (objeto, tipo) {
 			if (!this.tipoDe(tipo, Function)) {
 				return false;
 			}
 			return this.privadoInstanciaDeTipoPrimitivo(objeto, tipo);
 		},
-		
+
 		privadoInstanciaDeTipoPrimitivo: function (objeto, tipo) {
 			if (this.tipoDe(objeto, String) ||
 					this.tipoDe(objeto, Number) ||
@@ -121,16 +69,15 @@
 			}
 			return this.privadoInstanciaDeDiretaOuIndireta(objeto, tipo);
 		},
-		
+
 		privadoInstanciaDeDiretaOuIndireta: function (objeto, tipo) {
 			while (!this.nulo(objeto) && (objeto !== tipo.prototype)) {
 				objeto = this.fornecerPrototipoDe(objeto);
 			}
 			return (objeto === tipo.prototype);
 		},
-		
+
 		tipoDe: function (tipo, tipoComparado) {
-			/*jshint maxcomplexity: 7*/
 			var tipoComparadoTextual = "";
 			if (tipoComparado === Object) {
 				tipoComparadoTextual = this.tipos.OBJETO;
@@ -147,121 +94,119 @@
 			}
 			return (typeof tipo === tipoComparadoTextual);
 		},
-		
+
 		nuloOuIndefinido: function (valor) {
 			return (valor === null || valor === undefined);
 		},
-		
+
 		nulo: function (valor) {
 			return (valor === null);
 		},
-		
+
 		indefinido: function (valor) {
 			return (valor === undefined);
 		},
-		
+
 		assegureQue: function (condicao) {
 			if (!condicao) {
 				throw new ExcecaoLinda("Asserção inválida. Quebra de contrato.");
 			}
 		},
-		
+
 		assegureQueNao: function (condicao) {
 			this.assegureQue(!condicao);
 		},
-		
+
 		selecionar: function (selecao) {
 			return document.querySelector(selecao);
 		},
-		
+
 		selecionarTodos: function (selecao) {
 			return document.querySelectorAll(selecao);
 		},
-		
+
 		obterPelaClasse: function (classe) {
 			return document.getElementsByClassName(classe)[0];
 		},
-		
+
 		obterTodosPelaClasse: function (classe) {
 			return document.getElementsByClassName(classe);
 		},
-		
+
 		obterPeloNome: function (nome) {
 			return document.getElementsByName(nome)[0];
 		},
-		
+
 		obterTodosPeloNome: function (nome) {
 			return document.getElementsByName(nome);
 		},
-		
+
 		obterPeloIdentificador: function (identificador) {
 			return document.getElementById(identificador);
 		},
-		
+
 		criarElemento: function (elemento) {
 			return document.createElement(elemento);
 		},
-		
+
 		avaliar: function (texto) {
 			return window.eval(texto);
 		},
-		
+
 		habilitarTelaCheia: function () {
 			this.privadoHabilitarTelaCheia();
 			this.privadoHabilitarTelaCheiaChrome();
 			this.privadoHabilitarTelaCheiaFirefox();
 		},
-		
+
 		privadoHabilitarTelaCheia: function () {
 			if (this.instanciaDe(document.documentElement.requestFullScreen, Function)) {
 				document.documentElement.requestFullScreen();
 			}
 		},
-		
+
 		privadoHabilitarTelaCheiaChrome: function () {
 			if (this.instanciaDe(document.documentElement.mozRequestFullScreen, Function)) {
 				document.documentElement.mozRequestFullScreen();
 			}
 		},
-		
+
 		privadoHabilitarTelaCheiaFirefox: function () {
 			if (this.instanciaDe(document.documentElement.webkitRequestFullScreen, Function)) {
 				document.documentElement.webkitRequestFullScreen();
 			}
 		},
-		
+
 		desabilitarTelaCheia: function () {
 			this.privadoDesabilitarTelaCheia();
 			this.privadoDesabilitarTelaCheiaChrome();
 			this.privadoDesabilitarTelaCheiaFirefox();
 		},
-		
+
 		privadoDesabilitarTelaCheia: function () {
 			if (this.instanciaDe(document.cancelFullScreen, Function)) {
 				document.cancelFullScreen();
 			}
 		},
-		
+
 		privadoDesabilitarTelaCheiaChrome: function () {
 			if (this.instanciaDe(document.webkitCancelFullScreen, Function)) {
 				document.webkitCancelFullScreen();
 			}
 		},
-		
+
 		privadoDesabilitarTelaCheiaFirefox: function () {
 			if (this.instanciaDe(document.mozCancelFullScreen, Function)) {
 				document.mozCancelFullScreen();
 			}
 		}
 	};
-	
+
 	global.Linda = Linda;
 }(this));
-/*jshint bitwise: true, camelcase: true, curly: true, eqeqeq: true, forin: true, immed: true, latedef: true, newcap: true, noarg: true, noempty: true, nonew: false, plusplus: false, quotmark: "double", regexp: true, undef: true, unused: true, strict: true, trailing: true, indent: 4, maxparams: 3, maxdepth: 2, maxstatements: 10, maxcomplexity: 3, maxlen: 128 asi: false, boss: false, debug: false, eqnull: false, es5: false, esnext: false, evil: false, expr: false, globalstrict: false, funcscope: false, iterator: false, lastsemic: false, laxbreak: false, laxcomma: false, loopfunc: false, multistr: false, onecase: false, proto: false, regexdash: false, scripturl: false, smarttabs: false, shadow: false, sub: false, supernew: false, browser: true*/
-
 (function () {
 	"use strict";
-	
+
 	Function.prototype.implementar = function (implementacoes) {
 		for (var implementacao in implementacoes) {
 			if (implementacoes.hasOwnProperty(implementacao)) {
@@ -269,17 +214,17 @@
 			}
 		}
 	};
-	
+
 	Function.implementar({
 		aplicarComEscopo: function (escopo, argumentos) {
 			return this.apply(escopo, argumentos);
 		},
-		
+
 		chamarComEscopo: function (escopo) {
 			arguments.removerPosicao(0);
 			return this.aplicarComEscopo(escopo, arguments);
 		},
-		
+
 		estender: function (implementacoes) {
 			for (var implementacao in implementacoes) {
 				if (implementacoes.hasOwnProperty(implementacao)) {
@@ -287,7 +232,7 @@
 				}
 			}
 		},
-		
+
 		vincularEscopo: function (escopo) {
 			var essaFuncao = this;
 			var funcaoComEscopoVinculado = function () {
@@ -298,11 +243,11 @@
 	});
 }(this));
 /*global Linda*/
-/*jshint bitwise: true, camelcase: true, curly: true, eqeqeq: true, forin: true, immed: true, latedef: true, newcap: true, noarg: true, noempty: true, nonew: false, plusplus: false, quotmark: "double", regexp: true, undef: true, unused: true, strict: true, trailing: true, indent: 4, maxparams: 3, maxdepth: 2, maxstatements: 10, maxcomplexity: 3, maxlen: 128 asi: false, boss: false, debug: false, eqnull: false, es5: false, esnext: false, evil: false, expr: false, globalstrict: false, funcscope: false, iterator: false, lastsemic: false, laxbreak: false, laxcomma: false, loopfunc: false, multistr: false, onecase: false, proto: false, regexdash: false, scripturl: false, smarttabs: false, shadow: false, sub: false, supernew: false, browser: true*/
+/*global TipoDeObservacao*/
 
 (function () {
 	"use strict";
-	
+
 	Object.implementar({
 		definirPropriedade: function (atributo, definicao) {
 			var propriedades = {};
@@ -314,21 +259,34 @@
 			this.privadoDefinirPropriedade(propriedades, "configurable", definicao.configuravel);
 			Object.defineProperty(this, atributo, propriedades);
 		},
-		
+
+		definirPropriedades: function (definicoes) {
+			for (var indice = 0, propriedades = Object.getOwnPropertyNames(definicoes), tamanho = propriedades.length; indice < tamanho; indice++) {
+				var propriedade = propriedades[indice];
+				this.definirPropriedade(propriedade, definicoes[propriedade]);
+			}
+		},
+
 		privadoDefinirPropriedade: function (propriedades, chave, valor) {
 			if (!Linda.indefinido(valor)) {
 				propriedades[chave] = valor;
 			}
 		},
-		
+
 		fornecerPropriedades: function () {
 			return Object.getOwnPropertyNames(this);
 		},
-		
+
 		fornecerPropriedadesEnumeraveis: function () {
 			return Object.keys(this);
 		},
-		
+
+		fundir: function (outro) {
+			outro.paraCada(function (propriedade, chave) {
+				this[chave] = propriedade;
+			}, this);
+		},
+
 		observar: function (tratador, propriedade, tipoDeObservacao) {
 			Object.observe(this, function (observacoes) {
 				observacoes.paraCada(function (observacao) {
@@ -340,27 +298,27 @@
 				});
 			});
 		},
-		
+
 		observarAtualizacao: function (tratador, propriedade) {
 			this.observar(tratador, propriedade, TipoDeObservacao.ATUALIZACAO);
 		},
-		
+
 		observarCriacao: function (tratador, propriedade) {
 			this.observar(tratador, propriedade, TipoDeObservacao.CRIACAO);
 		},
-		
+
 		observarReconfiguracao: function (tratador, propriedade) {
 			this.observar(tratador, propriedade, TipoDeObservacao.RECONFIGURACAO);
 		},
-		
+
 		observarRemocao: function (tratador, propriedade) {
 			this.observar(tratador, propriedade, TipoDeObservacao.REMOCAO);
 		},
-		
+
 		desobservar: function (tratador) {
 			Object.unobserve(this, tratador);
 		},
-		
+
 		paraCada: function (funcaoDeIteracao, escopo) {
 			funcaoDeIteracao = funcaoDeIteracao.vincularEscopo(escopo);
 			for (var chave in this) {
@@ -369,90 +327,129 @@
 				}
 			}
 		},
-		
+
 		possuiPropriedade: function (propriedade) {
 			return (propriedade in this);
 		},
-		
+
 		possuiPropriedadePropria: function (propriedade) {
 			return this.hasOwnProperty(propriedade);
 		},
-		
+
 		prototipoDe: function (prototipado) {
 			return this.isPrototypeOf(prototipado);
 		}
 	});
 }(this));
-/*jshint bitwise: true, camelcase: true, curly: true, eqeqeq: true, forin: true, immed: true, latedef: true, newcap: true, noarg: true, noempty: true, nonew: false, plusplus: false, quotmark: "double", regexp: true, undef: true, unused: true, strict: true, trailing: true, indent: 4, maxparams: 3, maxdepth: 2, maxstatements: 10, maxcomplexity: 3, maxlen: 128 asi: false, boss: false, debug: false, eqnull: false, es5: false, esnext: false, evil: false, expr: false, globalstrict: false, funcscope: false, iterator: false, lastsemic: false, laxbreak: false, laxcomma: false, loopfunc: false, multistr: false, onecase: false, proto: false, regexdash: false, scripturl: false, smarttabs: false, shadow: false, sub: false, supernew: false, browser: true*/
-
 (function () {
 	"use strict";
-	
+
 	Array.implementar({
 		contem: function (valor) {
 			return (this.indexOf(valor) >= 0);
 		},
-		
+
+		embaralhar: function () {
+			for (var indice = 0, tamanho = this.length - 1; indice <= tamanho; indice++) {
+				var novoIndice = Number.sortearInteiro(0, tamanho);
+				var valorSalvo = this[indice];
+				this[indice] = this[novoIndice];
+				this[novoIndice] = valorSalvo;
+			}
+		},
+
 		dentroDosLimites: function (indice) {
 			return (!this.vazio() && indice >= 0 && indice < this.length);
 		},
-		
+
 		fornecerIndice: function (elemento) {
 			return this.indexOf(elemento);
 		},
-		
+
 		fundir: function (outra) {
 			this.push.aplicarComEscopo(this, outra);
 		},
-		
+
 		paraCada: function (funcaoDeIteracao, escopo) {
 			funcaoDeIteracao = funcaoDeIteracao.vincularEscopo(escopo);
 			for (var indice = 0; indice < this.length; indice++) {
 				funcaoDeIteracao(this[indice], indice);
 			}
 		},
-		
+
 		primeiro: function () {
 			return this[0];
 		},
-		
+
+		primeiroIndice: function () {
+			return 0;
+		},
+
+		quantidadeMenorQue: function (quantidade) {
+			return (this.length < quantidade);
+		},
+
+		quantidadeMenorIgualQue: function (quantidade) {
+			return (this.length <= quantidade);
+		},
+
+		quantidadeMaiorQue: function (quantidade) {
+			return (this.length > quantidade);
+		},
+
+		quantidadeMaiorIgualQue: function (quantidade) {
+			return (this.length >= quantidade);
+		},
+
+		quantidadeIgual: function (quantidade) {
+			return (this.length === quantidade);
+		},
+
+		reduzir: function (funcaoDeReducao, valorAtual, escopo) {
+			funcaoDeReducao = funcaoDeReducao.vincularEscopo(escopo);
+			valorAtual = valorAtual || 0;
+			for (var indice = 0; indice < this.length; indice++) {
+				valorAtual = funcaoDeReducao(valorAtual, this[indice], indice);
+			}
+			return valorAtual;
+		},
+
 		removerPosicao: function (posicao) {
 			this.splice(posicao, 1);
 		},
-		
+
 		removerElemento: function (elemento) {
 			this.removerPosicao(this.fornecerIndice(elemento));
 		},
-		
+
 		ultimo: function () {
 			return this[this.length - 1];
 		},
-		
+
 		ultimoIndice: function () {
 			return (this.length - 1);
 		},
-		
+
 		vazio: function () {
 			return (this.length === 0);
 		}
 	});
 } ());
 /*global Linda*/
-/*jshint bitwise: true, camelcase: true, curly: true, eqeqeq: true, forin: true, immed: true, latedef: true, newcap: true, noarg: true, noempty: true, nonew: false, plusplus: false, quotmark: "double", regexp: true, undef: true, unused: true, strict: true, trailing: true, indent: 4, maxparams: 3, maxdepth: 2, maxstatements: 10, maxcomplexity: 3, maxlen: 128 asi: false, boss: false, debug: false, eqnull: false, es5: false, esnext: false, evil: false, expr: false, globalstrict: false, funcscope: false, iterator: false, lastsemic: false, laxbreak: false, laxcomma: false, loopfunc: false, multistr: false, onecase: false, proto: false, regexdash: false, scripturl: false, smarttabs: false, shadow: false, sub: false, supernew: false, browser: true*/
 
 (function () {
 	"use strict";
-	
+
 	String.implementar({
 		paraInteiro: function () {
 			return Linda.global.parseInt(this);
 		},
-		
+
 		paraFlutuante: function () {
 			return Linda.global.parseFloat(this);
 		}
 	});
-	
+
 	String.estender({
 		concatenar: function () {
 			var texto = "";
@@ -461,7 +458,7 @@
 			}
 			return texto;
 		},
-		
+
 		concatenarComEspaco: function () {
 			var texto = "";
 			for (var indice = 0; indice < arguments.length; indice++) {
@@ -469,7 +466,7 @@
 			}
 			return (arguments.length > 0) ? texto.substr(1, texto.length - 1) : texto;
 		},
-		
+
 		formatar: function (mensagem) {
 			for (var indice = 1; indice < arguments.length; indice++) {
 				mensagem = mensagem.replace(new RegExp("%@"), arguments[indice]);
@@ -481,23 +478,58 @@
 		}
 	});
 }());
-/*jshint bitwise: true, camelcase: true, curly: true, eqeqeq: true, forin: true, immed: true, latedef: true, newcap: true, noarg: true, noempty: true, nonew: false, plusplus: false, quotmark: "double", regexp: true, undef: true, unused: true, strict: true, trailing: true, indent: 4, maxparams: 3, maxdepth: 2, maxstatements: 10, maxcomplexity: 3, maxlen: 128 asi: false, boss: false, debug: false, eqnull: false, es5: false, esnext: false, evil: false, expr: false, globalstrict: false, funcscope: false, iterator: false, lastsemic: false, laxbreak: false, laxcomma: false, loopfunc: false, multistr: false, onecase: false, proto: false, regexdash: false, scripturl: false, smarttabs: false, shadow: false, sub: false, supernew: false, browser: true*/
-
 (function () {
 	"use strict";
-	
+
 	Number.estender({
 		naoNumero: function (valor) {
 			return (valor !== valor);
+		},
+
+		sortear: function (limiteA, limiteB) {
+			var limiteInferior = Math.min(limiteA, limiteB);
+			var limiteSuperior = Math.max(limiteA, limiteB);
+			return (Math.random() * (limiteSuperior - limiteInferior) + limiteInferior);
+		},
+
+		sortearInteiro: function (limiteA, limiteB) {
+			var limiteInferior = Math.min(limiteA, limiteB);
+			var limiteSuperior = Math.max(limiteA, limiteB);
+			return (Math.floor(Math.random() * (limiteSuperior - limiteInferior + 1)) + Math.floor(limiteInferior));
+		}
+	});
+
+	Number.definirPropriedades({
+		maximo: {
+			funcaoFornecer: function () {
+				return Number.MAX_VALUE;
+			}
+		},
+
+		minimo: {
+			funcaoFornecer: function () {
+				return Number.MIN_VALUE;
+			}
+		},
+
+		maisInfinito: {
+			funcaoFornecer: function () {
+				return Number.POSITIVE_INFINITY;
+			},
+		},
+
+		menosInfinito: {
+			funcaoFornecer: function () {
+				return Number.NEGATIVE_INFINITY;
+			}
 		}
 	});
 }());
 /*global Linda*/
-/*jshint bitwise: true, camelcase: true, curly: true, eqeqeq: true, forin: true, immed: true, latedef: true, newcap: true, noarg: true, noempty: true, nonew: false, plusplus: false, quotmark: "double", regexp: true, undef: true, unused: true, strict: true, trailing: true, indent: 4, maxparams: 3, maxdepth: 2, maxstatements: 10, maxcomplexity: 3, maxlen: 128 asi: false, boss: false, debug: false, eqnull: false, es5: false, esnext: false, evil: false, expr: false, globalstrict: false, funcscope: false, iterator: false, lastsemic: false, laxbreak: false, laxcomma: false, loopfunc: false, multistr: false, onecase: false, proto: false, regexdash: false, scripturl: false, smarttabs: false, shadow: false, sub: false, supernew: false, browser: true*/
 
 (function (global) {
 	"use strict";
-	
+
 	var Prototipo = function Prototipo(corpoDoPrototipo) {
 		var inicializar = corpoDoPrototipo.inicializar;
 		var inicializa = Linda.instanciaDe(inicializar, Function);
@@ -516,11 +548,11 @@
 		NovoPrototipo.implementar(corpoDoPrototipo);
 		return NovoPrototipo;
 	};
-	
+
 	var PrototipoUnico = function PrototipoUnico(corpoDoPrototipo) {
 		var novoPrototipoUnico = {
 			instanciaUnica: null,
-			
+
 			instancia: function () {
 				var NovoPrototipo = new Prototipo(corpoDoPrototipo);
 				this.instanciaUnica = new NovoPrototipo();
@@ -538,7 +570,7 @@
 		};
 		return novoPrototipoUnico;
 	};
-	
+
 	var EnumeracaoDePrototipos = new Prototipo({
 		inicializar: function (enumeracoes, corpoDoPrototipo) {
 			var PrototipoDaEnumeracao = new Prototipo(corpoDoPrototipo);
@@ -547,7 +579,7 @@
 				this[enumeracao].inicializarEnumeracao.aplicarComEscopo(this[enumeracao], argumentos);
 			}, this);
 		},
-		
+
 		mapear: function (chave) {
 			var enumeracaoEncontrada = null;
 			this.paraCada(function (enumeracao) {
@@ -558,7 +590,7 @@
 			}, this);
 			return enumeracaoEncontrada;
 		},
-		
+
 		comoLista: function () {
 			var lista = [];
 			this.paraCada(function (enumeracao) {
@@ -569,14 +601,14 @@
 			return lista;
 		}
 	});
-	
+
 	var EnumeracaoDeConstantes = new Prototipo({
 		inicializar: function (enumeracoes) {
 			enumeracoes.paraCada(function (valor, enumeracao) {
 				this[enumeracao] = valor;
 			}, this);
 		},
-		
+
 		mapear: function (chave) {
 			var enumeracaoEncontrada = null;
 			this.paraCada(function (enumeracao) {
@@ -587,7 +619,7 @@
 			}, this);
 			return enumeracaoEncontrada;
 		},
-		
+
 		comoLista: function () {
 			var lista = [];
 			this.paraCada(function (enumeracao) {
@@ -596,7 +628,7 @@
 			return lista;
 		}
 	});
-	
+
 	global.Prototipo = Prototipo;
 	global.PrototipoUnico = PrototipoUnico;
 	global.EnumeracaoDePrototipos = EnumeracaoDePrototipos;
@@ -605,14 +637,12 @@
 /*global Linda*/
 /*global EnumeracaoDeConstantes*/
 /*global EnumeracaoDePrototipos*/
-/*jshint bitwise: true, camelcase: true, curly: true, eqeqeq: true, forin: true, immed: true, latedef: true, newcap: true, noarg: true, noempty: true, nonew: false, plusplus: false, quotmark: "double", regexp: true, undef: true, unused: true, strict: true, trailing: true, indent: 4, maxparams: 3, maxdepth: 2, maxstatements: 10, maxcomplexity: 3, maxlen: 128 asi: false, boss: false, debug: false, eqnull: false, es5: false, esnext: false, evil: false, expr: false, globalstrict: false, funcscope: false, iterator: false, lastsemic: false, laxbreak: false, laxcomma: false, loopfunc: false, multistr: false, onecase: false, proto: false, regexdash: false, scripturl: false, smarttabs: false, shadow: false, sub: false, supernew: false, browser: true*/
-/*jshint maxstatements: 20*/
 
 (function (global) {
 	"use strict";
-	
+
 	var Tipo = new EnumeracaoDeConstantes(Linda.tipos);
-	
+
 	var Evento = new EnumeracaoDeConstantes({
 		TECLA_PRESSIONADA: "keydown",
 		TECLA_SOLTA: "keyup",
@@ -620,14 +650,14 @@
 		CLIQUE: "click",
 		DUPLO_CLIQUE: "dbclick"
 	});
-	
+
 	var Tecla = new EnumeracaoDeConstantes({
 		CIMA: 38,
 		BAIXO: 40,
 		ESQUERDA: 37,
 		DIREITA: 39
 	});
-	
+
 	var AtributoHttp = new EnumeracaoDeConstantes({
 		CONTENT_TYPE: "Content-Type",
 		ACCEPT: "Accept",
@@ -653,7 +683,7 @@
 		USER_AGENT: "User-Agent",
 		VIA: "Via"
 	});
-	
+
 	var MetodoHttp = new EnumeracaoDeConstantes({
 		GET: "GET",
 		PUT: "PUT",
@@ -662,7 +692,7 @@
 		HEAD: "HEAD",
 		OPTIONS: "OPTIONS"
 	});
-	
+
 	var TipoDeResposta = new EnumeracaoDeConstantes({
 		JSON: "",
 		TEXTO: "text",
@@ -670,7 +700,7 @@
 		BLOB: "blob",
 		ARRAY_BUFFER: "arraybuffer"
 	});
-	
+
 	var TipoGenericoDeMidia = new EnumeracaoDePrototipos({
 		APLICACAO: ["application"],
 		AUDIO: ["audio"],
@@ -684,16 +714,16 @@
 		inicializarEnumeracao: function (chave) {
 			this.chave = chave;
 		},
-		
+
 		comoTexto: function () {
 			return this.chave;
 		},
-		
+
 		comoTextoGenerico: function () {
 			return String.formatar("%@/*", this.chave);
 		}
 	});
-	
+
 	var TipoDeMidia = new EnumeracaoDePrototipos({
 		JS: [TipoGenericoDeMidia.APLICACAO, "javascript"],
 		JSON: [TipoGenericoDeMidia.APLICACAO, "json"],
@@ -721,16 +751,16 @@
 			this.tipo = tipo;
 			this.chave = String.formatar("%@/%@", this.tipoGenerico.comoTexto(), this.tipo);
 		},
-		
+
 		comoTexto: function () {
 			return this.chave;
 		},
-		
+
 		comoTextoGenerico: function () {
 			return this.tipoGenerico.comoTextoGenerico();
 		}
 	});
-	
+
 	var CodigoHttp = new EnumeracaoDePrototipos({
 		HTTP_100: [100, "Continuar", "Continue"],
 		HTTP_101: [101, "Trocando protocolos", "Switching Protocols"],
@@ -779,47 +809,47 @@
 			this.texto = texto;
 			this.textoIngles = textoIngles;
 		},
-		
+
 		comoNumero: function () {
 			return this.chave;
 		},
-		
+
 		comoTexto: function () {
 			return this.texto;
 		},
-		
+
 		comoTextoIngles: function () {
 			return this.textoIngles;
 		},
-		
+
 		informacional: function () {
 			return (this.chave >= 100 && this.chave < 200);
 		},
-		
+
 		sucesso: function () {
 			return (this.chave >= 200 && this.chave < 300);
 		},
-		
+
 		redirecionamento: function () {
 			return (this.chave >= 300 && this.chave < 400);
 		},
-		
+
 		erroDoCliente: function () {
 			return (this.chave >= 400 && this.chave < 500);
 		},
-		
+
 		erroDoServidor: function () {
 			return (this.chave >= 500 && this.chave < 600);
 		}
 	});
-	
+
 	var TipoDeObservacao = new EnumeracaoDeConstantes({
 		ATUALIZACAO: "updated",
 		RECONFIGURACAO: "reconfigured",
 		REMOCAO: "deleted",
 		CRIACAO: "new"
 	});
-	
+
 	global.Tipo = Tipo;
 	global.Evento = Evento;
 	global.Tecla = Tecla;
@@ -831,11 +861,16 @@
 	global.TipoGenericoDeMidia = TipoGenericoDeMidia;
 	global.TipoDeObservacao = TipoDeObservacao;
 }(this));
-/*jshint bitwise: true, camelcase: true, curly: true, eqeqeq: true, forin: true, immed: true, latedef: true, newcap: true, noarg: true, noempty: true, nonew: false, plusplus: false, quotmark: "double", regexp: true, undef: true, unused: true, strict: true, trailing: true, indent: 4, maxparams: 3, maxdepth: 2, maxstatements: 10, maxcomplexity: 3, maxlen: 128 asi: false, boss: false, debug: false, eqnull: false, es5: false, esnext: false, evil: false, expr: false, globalstrict: false, funcscope: false, iterator: false, lastsemic: false, laxbreak: false, laxcomma: false, loopfunc: false, multistr: false, onecase: false, proto: false, regexdash: false, scripturl: false, smarttabs: false, shadow: false, sub: false, supernew: false, browser: true*/
+/*global CodigoHttp*/
+/*global Evento*/
+/*global Linda*/
+/*global MetodoHttp*/
+/*global Prototipo*/
+/*global TipoDeResposta*/
 
 (function (global) {
 	"use strict";
-	
+
 	var RequisicaoHttp = new Prototipo({
 		inicializarSuper: function (uri, tipoDeResposta) {
 			this.requisicaoXml = new XMLHttpRequest();
@@ -846,7 +881,7 @@
 			this.adicionarTratadoresDeEventos();
 			this.cabecalho = [];
 		},
-		
+
 		adicionarTratadoresDeEventos: function () {
 			this.requisicaoXml.onloadstart = function (evento) {
 				this.tratarInicio(evento.loaded, evento.total, evento.timeStamp);
@@ -884,9 +919,8 @@
 				this.tratarResposta(resposta, codigoDeEstado, carregado, total, estampaDeTempo);
 			}.vincularEscopo(this);
 		},
-		
+
 		enviar: function (metodo, dados, assincrono) {
-			var metodosSuportados = MetodoHttp.comoLista();
 			assincrono = !!assincrono;
 			metodo = MetodoHttp.mapear(metodo);
 			this.requisicaoXml.open(metodo, this.uri, assincrono, this.usuario, this.senha);
@@ -898,131 +932,131 @@
 				return this.fornecerResposta();
 			}
 		},
-		
+
 		enviarGet: function (assincrono) {
 			return this.enviar(MetodoHttp.GET, null, assincrono);
 		},
-		
+
 		enviarPut: function (dados, assincrono) {
 			return this.enviar(MetodoHttp.PUT, dados, assincrono);
 		},
-		
+
 		enviarPost: function (dados, assincrono) {
 			return this.enviar(MetodoHttp.POST, dados, assincrono);
 		},
-		
+
 		envirDelete: function (assincrono) {
 			return this.enviar(MetodoHttp.DELETE, null, assincrono);
 		},
-		
-		tratarInicio: function (carregado, total, estampaDeTempo) {},
-		
-		tratarProgresso: function (carregado, total, estampaDeTempo) {},
-		
-		tratarTermino: function (carregado, total, estampaDeTempo) {},
-		
-		tratarErro: function (carregado, total, estampaDeTempo) {},
-		
-		tratarAborto: function (carregado, total, estampaDeTempo) {},
-		
-		tratarEstouroDeTempo: function (carregado, total, estampaDeTempo) {},
-		
-		tratarResposta: function (resposta, codigoDeEstado, carregado, total, estampaDeTempo) {},
-		
-		tratarRedirecionamento: function (resposta, codigoDeEstado, carregado, total, estampaDeTempo) {},
-		
-		tratarSucesso: function (resposta, codigoDeEstado, carregado, total, estampaDeTempo) {},
-		
-		tratarErroDoCliente: function (resposta, codigoDeEstado, carregado, total, estampaDeTempo) {},
-		
-		tratarErroDoServidor: function (resposta, codigoDeEstado, carregado, total, estampaDeTempo) {},
-		
+
+		tratarInicio: function () {},
+
+		tratarProgresso: function () {},
+
+		tratarTermino: function () {},
+
+		tratarErro: function () {},
+
+		tratarAborto: function () {},
+
+		tratarEstouroDeTempo: function () {},
+
+		tratarResposta: function () {},
+
+		tratarRedirecionamento: function () {},
+
+		tratarSucesso: function () {},
+
+		tratarErroDoCliente: function () {},
+
+		tratarErroDoServidor: function () {},
+
 		abortar: function () {
 			this.requisicaoXml.abort();
 			return this;
 		},
-		
+
 		fixarAtributoDeCabecalho: function (nome, valor) {
 			this.cabecalho.push({nome: nome, valor: valor});
 			return this;
 		},
-		
+
 		fixarAutenticacao: function (usuario, senha) {
 			this.usuario = usuario;
 			this.senha = senha;
 			return this;
 		},
-		
+
 		fixarTempoLimite: function (tempoLimite) {
 			this.requisicaoXml.timeout = tempoLimite;
-			return this; 
+			return this;
 		},
-		
+
 		fornecerResposta: function () {
 			return this.requisicaoXml.response;
 		}
 	});
-	
+
 	var RequisicaoJson = new Prototipo({
 		Estende: RequisicaoHttp,
-		
+
 		inicializar: function (uri) {
 			this.inicializarSuper(uri, TipoDeResposta.JSON);
 		},
-		
+
 		fornecerResposta: function () {
 			return JSON.parse(this.requisicaoXml.response);
 		}
 	});
-	
+
 	var RequisicaoDocumento = new Prototipo({
 		Estende: RequisicaoHttp,
-		
+
 		inicializar: function (uri) {
 			this.inicializarSuper(uri, TipoDeResposta.DOCUMENTO);
 		}
 	});
-	
+
 	var RequisicaoTexto = new Prototipo({
 		Estende: RequisicaoHttp,
-		
+
 		inicializar: function (uri) {
 			this.inicializarSuper(uri, TipoDeResposta.TEXTO);
 		}
 	});
-	
+
 	var Tratador = new Prototipo({
 		inicializarSuper: function (elemento) {
 			this.elemento = (Linda.nuloOuIndefinido(elemento)) ? Linda.janela : elemento;
 		},
-		
+
 		adicionar: function (evento, tratador) {
 			this.elemento.addEventListener(evento, tratador);
 		},
-		
+
 		remover: function (evento) {
 			this.elemento.removeEventListener(evento);
 		}
 	});
-	
+
 	var TratadorDeTeclado = new Prototipo({
 		Estende: Tratador,
-		
+
 		inicializar: function (tecla, elemento) {
 			this.inicializarSuper(elemento);
 			this.tecla = tecla;
 		},
-		
+
 		paraTeclaPressionada: function (tratador) {
 			this.adicionar(Evento.TECLA_PRESSIONADA, this.adicionarTratadorDeTeclado(tratador));
 			return this;
 		},
-		
+
 		paraTeclaSolta: function (tratador) {
 			this.adicionar(Evento.TECLA_SOLTA, this.adicionarTratadorDeTeclado(tratador));
 			return this;
 		},
-		
+
 		adicionarTratadorDeTeclado: function (tratador) {
 			return function (evento) {
 				if (this.tecla === evento.keyCode) {
@@ -1031,33 +1065,33 @@
 			}.vincularEscopo(this);
 		}
 	});
-	
+
 	var TratadorDeMouse = new Prototipo({
 		Estende: Tratador,
-		
+
 		inicializar: function (elemento) {
 			this.inicializarSuper(elemento);
 		},
-		
+
 		paraClique: function (tratador) {
 			this.adicionar(Evento.CLIQUE, tratador);
 			return this;
 		}
 	});
-	
+
 	var TratadorDePagina = new Prototipo({
 		Estende: Tratador,
-		
+
 		inicializar: function (elemento) {
 			this.inicializarSuper(elemento);
 		},
-		
+
 		paraCarregamento: function (tratador) {
 			this.adicionar(Evento.CARREGADO, tratador);
 			return this;
 		}
 	});
-	
+
 	global.RequisicaoJson = RequisicaoJson;
 	global.RequisicaoDocumento = RequisicaoDocumento;
 	global.RequisicaoTexto = RequisicaoTexto;
@@ -1065,122 +1099,138 @@
 	global.TratadorDeMouse = TratadorDeMouse;
 	global.TratadorDePagina = TratadorDePagina;
 }(this));
+/*global HTMLCollection*/
+/*global NodeList*/
 /*global TratadorDeMouse*/
 /*global TratadorDePagina*/
 /*global TratadorDeTeclado*/
-/*jshint bitwise: true, camelcase: true, curly: true, eqeqeq: true, forin: true, immed: true, latedef: true, newcap: true, noarg: true, noempty: true, nonew: false, plusplus: false, quotmark: "double", regexp: true, undef: true, unused: true, strict: true, trailing: true, indent: 4, maxparams: 3, maxdepth: 2, maxstatements: 10, maxcomplexity: 3, maxlen: 128 asi: false, boss: false, debug: false, eqnull: false, es5: false, esnext: false, evil: false, expr: false, globalstrict: false, funcscope: false, iterator: false, lastsemic: false, laxbreak: false, laxcomma: false, loopfunc: false, multistr: false, onecase: false, proto: false, regexdash: false, scripturl: false, smarttabs: false, shadow: false, sub: false, supernew: false, browser: true*/
 
 (function () {
 	"use strict";
-	
+
 	Node.implementar = Function.prototype.implementar;
 	NodeList.implementar = Function.prototype.implementar;
 	HTMLCollection.implementar = Function.prototype.implementar;
-	
+
 	Node.implementar({
 		limpar: function () {
 			while (this.hasChildNodes()) {
 				this.removeChild(this.firstChild);
 			}
 		},
-		
+
 		selecionar: function (selecao) {
 			return this.querySelector(selecao);
 		},
-		
+
 		selecionarTodos: function (selecao) {
 			return this.querySelectorAll(selecao);
 		},
-		
+
 		tratadorDeClique: function (tratador) {
 			return new TratadorDeMouse(this).paraClique(tratador);
 		},
-		
+
 		tratadorDeCarregamento: function (tratador) {
 			return new TratadorDePagina(this).paraCarregamento(tratador);
 		},
-		
+
 		tratadorDeTeclaPressionada: function (tecla, tratador) {
 			return new TratadorDeTeclado(tecla, this).paraTeclaPressionada(tratador);
 		},
-			
+
 		tratadorDeTeclaSolta: function (tecla, tratador) {
 			return new TratadorDeTeclado(tecla, this).paraTeclaSolta(tratador);
 		}
 	});
-	
+
 	NodeList.implementar({
 		paraCada: Array.prototype.paraCada
 	});
-	
+
 	HTMLCollection.implementar({
 		paraCada: Array.prototype.paraCada
 	});
 }(this));
-/*jshint bitwise: true, camelcase: true, curly: true, eqeqeq: true, forin: true, immed: true, latedef: true, newcap: true, noarg: true, noempty: true, nonew: false, plusplus: false, quotmark: "double", regexp: true, undef: true, unused: true, strict: true, trailing: true, indent: 4, maxparams: 3, maxdepth: 2, maxstatements: 10, maxcomplexity: 3, maxlen: 128 asi: false, boss: false, debug: false, eqnull: false, es5: false, esnext: false, evil: false, expr: false, globalstrict: false, funcscope: false, iterator: false, lastsemic: false, laxbreak: false, laxcomma: false, loopfunc: false, multistr: false, onecase: false, proto: false, regexdash: false, scripturl: false, smarttabs: false, shadow: false, sub: false, supernew: false, browser: true*/
-/*jshint maxstatements: 10*/
+/*global Linda*/
 
 (function () {
-	Linda.definirPropriedade("privadoInstanciaDeTipoPrimitivo", Linda.propriedadesDeAtributos);
-	Linda.definirPropriedade("privadoInstanciaDeDiretaOuIndireta", Linda.propriedadesDeAtributos);
-	Linda.definirPropriedade("privadoHabilitarTelaCheia", Linda.propriedadesDeAtributos);
-	Linda.definirPropriedade("privadoHabilitarTelaCheiaChrome", Linda.propriedadesDeAtributos);
-	Linda.definirPropriedade("privadoHabilitarTelaCheiaFirefox", Linda.propriedadesDeAtributos);
-	Linda.definirPropriedade("privadoDesabilitarTelaCheia", Linda.propriedadesDeAtributos);
-	Linda.definirPropriedade("privadoDesabilitarTelaCheiaChrome", Linda.propriedadesDeAtributos);
-	Linda.definirPropriedade("privadoDesabilitarTelaCheiaFirefox", Linda.propriedadesDeAtributos);
-	
-	Object.prototype.definirPropriedade("definirPropriedade", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("privadoDefinirPropriedade", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("fornecerPropriedades", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("fornecerPropriedadesEnumeraveis", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("observar", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("observarAtualizacao", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("observarCriacao", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("observarReconfiguracao", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("observarRemocao", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("desobservar", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("paraCada", Linda.propriedadesDeAtributosGravaveis);
-	Object.prototype.definirPropriedade("possuiPropriedade", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("possuiPropriedadePropria", Linda.propriedadesDeAtributos);
-	Object.prototype.definirPropriedade("prototipoDe", Linda.propriedadesDeAtributos);
-	
-	Function.prototype.definirPropriedade("aplicarComEscopo", Linda.propriedadesDeAtributos);
-	Function.prototype.definirPropriedade("chamarComEscopo", Linda.propriedadesDeAtributos);
-	Function.prototype.definirPropriedade("estender", Linda.propriedadesDeAtributos);
-	Function.prototype.definirPropriedade("implementar", Linda.propriedadesDeAtributos);
-	Function.prototype.definirPropriedade("vincularEscopo", Linda.propriedadesDeAtributos);
-	
-	Function.definirPropriedade("implementar", Linda.propriedadesDeAtributos);
+	"use strict";
 
-	Array.prototype.definirPropriedade("contem", Linda.propriedadesDeAtributos);
-	Array.prototype.definirPropriedade("dentroDosLimites", Linda.propriedadesDeAtributos);
-	Array.prototype.definirPropriedade("fornecerIndice", Linda.propriedadesDeAtributos);
-	Array.prototype.definirPropriedade("fundir", Linda.propriedadesDeAtributos);
-	Array.prototype.definirPropriedade("paraCada", Linda.propriedadesDeAtributos);
-	Array.prototype.definirPropriedade("primeiro", Linda.propriedadesDeAtributos);
-	Array.prototype.definirPropriedade("removerPosicao", Linda.propriedadesDeAtributos);
-	Array.prototype.definirPropriedade("removerElemento", Linda.propriedadesDeAtributos);
-	Array.prototype.definirPropriedade("ultimo", Linda.propriedadesDeAtributos);
-	Array.prototype.definirPropriedade("ultimoIndice", Linda.propriedadesDeAtributos);
-	Array.prototype.definirPropriedade("vazio", Linda.propriedadesDeAtributos);
-	
-	String.prototype.definirPropriedade("paraInteiro", Linda.propriedadesDeAtributos);
-	String.prototype.definirPropriedade("paraFlutuante", Linda.propriedadesDeAtributos);
-	
-	String.definirPropriedade("concatenar", Linda.propriedadesDeAtributos);
-	String.definirPropriedade("concatenarComEspaco", Linda.propriedadesDeAtributos);
-	String.definirPropriedade("formatar", Linda.propriedadesDeAtributos);
-	
-	Number.definirPropriedade("naoNumero", Linda.propriedadesDeAtributos);
-	
-	Node.prototype.definirPropriedade("limpar", Linda.propriedadesDeAtributos);
-	Node.prototype.definirPropriedade("selecionar", Linda.propriedadesDeAtributos);
-	Node.prototype.definirPropriedade("selecionarTodos", Linda.propriedadesDeAtributos);
-	Node.prototype.definirPropriedade("tratadorDeCarregamento", Linda.propriedadesDeAtributos);
-	Node.prototype.definirPropriedade("tratadorDeClique", Linda.propriedadesDeAtributos);
-	Node.prototype.definirPropriedade("tratadorDeTeclaPressionada", Linda.propriedadesDeAtributos);
-	Node.prototype.definirPropriedade("tratadorDeTeclaSolta", Linda.propriedadesDeAtributos);
-	
-	Node.definirPropriedade("implementar", Linda.propriedadesDeAtributos);
+	Linda.definirPropriedades({
+		privadoInstanciaDeTipoPrimitivo: Linda.propriedadesDeAtributos,
+		privadoInstanciaDeDiretaOuIndireta: Linda.propriedadesDeAtributos,
+		privadoHabilitarTelaCheia: Linda.propriedadesDeAtributos,
+		privadoHabilitarTelaCheiaChrome: Linda.propriedadesDeAtributos,
+		privadoHabilitarTelaCheiaFirefox: Linda.propriedadesDeAtributos,
+		privadoDesabilitarTelaCheia: Linda.propriedadesDeAtributos,
+		privadoDesabilitarTelaCheiaChrome: Linda.propriedadesDeAtributos,
+		privadoDesabilitarTelaCheiaFirefox: Linda.propriedadesDeAtributos
+	});
+
+	Object.prototype.definirPropriedades({
+		definirPropriedade: Linda.propriedadesDeAtributos,
+		definirPropriedades: Linda.propriedadesDeAtributos,
+		privadoDefinirPropriedade: Linda.propriedadesDeAtributos,
+		fornecerPropriedades: Linda.propriedadesDeAtributos,
+		fornecerPropriedadesEnumeraveis: Linda.propriedadesDeAtributos,
+		fundir: Linda.propriedadesDeAtributos,
+		observar: Linda.propriedadesDeAtributos,
+		observarAtualizacao: Linda.propriedadesDeAtributos,
+		observarCriacao: Linda.propriedadesDeAtributos,
+		observarReconfiguracao: Linda.propriedadesDeAtributos,
+		observarRemocao: Linda.propriedadesDeAtributos,
+		desobservar: Linda.propriedadesDeAtributos,
+		paraCada: Linda.propriedadesDeAtributosGravaveis,
+		possuiPropriedade: Linda.propriedadesDeAtributos,
+		possuiPropriedadePropria: Linda.propriedadesDeAtributos,
+		prototipoDe: Linda.propriedadesDeAtributos
+	});
+
+	Function.prototype.definirPropriedades({
+		aplicarComEscopo: Linda.propriedadesDeAtributos,
+		chamarComEscopo: Linda.propriedadesDeAtributos,
+		estender: Linda.propriedadesDeAtributos,
+		implementar: Linda.propriedadesDeAtributos,
+		vincularEscopo: Linda.propriedadesDeAtributos
+	});
+
+	Array.prototype.definirPropriedades({
+		contem: Linda.propriedadesDeAtributos,
+		dentroDosLimites: Linda.propriedadesDeAtributos,
+		embaralhar: Linda.propriedadesDeAtributos,
+		fornecerIndice: Linda.propriedadesDeAtributos,
+		fundir: Linda.propriedadesDeAtributos,
+		paraCada: Linda.propriedadesDeAtributos,
+		primeiro: Linda.propriedadesDeAtributos,
+		primeiroIndice: Linda.propriedadesDeAtributos,
+		quantidadeMenorQue: Linda.propriedadesDeAtributos,
+		quantidadeMenorIgualQue: Linda.propriedadesDeAtributos,
+		quantidadeMaiorQue: Linda.propriedadesDeAtributos,
+		quantidadeMaiorIgualQue: Linda.propriedadesDeAtributos,
+		quantidadeIgual: Linda.propriedadesDeAtributos,
+		reduzir: Linda.propriedadesDeAtributos,
+		removerPosicao: Linda.propriedadesDeAtributos,
+		removerElemento: Linda.propriedadesDeAtributos,
+		ultimo: Linda.propriedadesDeAtributos,
+		ultimoIndice: Linda.propriedadesDeAtributos,
+		vazio: Linda.propriedadesDeAtributos
+	});
+
+	String.prototype.definirPropriedades({
+		paraInteiro: Linda.propriedadesDeAtributos,
+		paraFlutuante: Linda.propriedadesDeAtributos
+	});
+
+	String.definirPropriedades({
+		concatenar: Linda.propriedadesDeAtributos,
+		concatenarComEspaco: Linda.propriedadesDeAtributos,
+		formatar: Linda.propriedadesDeAtributos
+	});
+
+	Number.definirPropriedades({
+		naoNumero: Linda.propriedadesDeAtributos,
+		sortear: Linda.propriedadesDeAtributos,
+		sortearInteiro: Linda.propriedadesDeAtributos
+	});
 }());

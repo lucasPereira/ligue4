@@ -8,6 +8,7 @@
 			Ligue4Modelo.instancia();
 			Ligue4Visao.instancia();
 			Ligue4Controle.instancia();
+			Ligue4Ia.instancia();
 		},
 		
 		declararVencedor: function (sequenciasVencedoras) {

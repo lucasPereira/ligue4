@@ -9,7 +9,7 @@
 			};
 			this.tabuleiro = new Tabuleiro(this.quantidadeDeLinhas, this.quantidadeDeColunas);;
 			this.ordemDeJogadores = [this.jogadores.humano, this.jogadores.computador];
-			//TODO: sortear posição
+			this.ordemDeJogadores.embaralhar();
 		},
 		
 		jogar: function (coluna) {
@@ -28,6 +28,22 @@
 			return jogadaRealizada;
 		},
 		
+		jogarHumano: function (coluna) {
+			if (this.humanoPodeJogar()) {
+				this.jogar(coluna);
+				return true;
+			}
+			return false;
+		},
+		
+		jogarComputador: function (coluna) {
+			if (this.computadorPodeJogar()) {
+				this.jogar(coluna);
+				return true;
+			}
+			return false;
+		},
+		
 		humanoPodeJogar: function () {
 			return (this.ordemDeJogadores.primeiro().igual(this.jogadores.humano) && this.podeJogar());
 		},
@@ -42,14 +58,43 @@
 	});
 	
 	Tabuleiro = new Prototipo({
-		inicializar: function (quantidadeDeLinhas, quantidadeDeColunas) {
+		inicializar: function (quantidadeDeLinhas, quantidadeDeColunas, clonagem) {
 			this.sequenciasVencedoras = [];
 			this.celulas = new Array(this.quantidadeDeLinhas);
 			this.quantidadeDeLinhas = quantidadeDeLinhas;
 			this.quantidadeDeColunas = quantidadeDeColunas;
 			this.quantidadeDeLigacoes = 3;
 			this.celulasOcupadas = 0;
-			this.construirTabuleiro();
+			if (Linda.nuloOuIndefinido(clonagem) || !clonagem) {
+				this.construirTabuleiro();
+			}
+		},
+		
+		clonar: function () {
+			var clone = new Tabuleiro(this.quantidadeDeLinhas, this.quantidadeDeColunas, true);
+			clone.celulasOcupadas = this.celulasOcupadas;
+			this.clonarCelulas(clone);
+			this.clonarSequenciasVencedoras(clone);
+			return clone;
+		},
+		
+		clonarCelulas: function (clone) {
+			this.celulas.paraCada(function (linha, indiceDaLinha) {
+				clone.celulas[indiceDaLinha] = new Array(this.quantidadeDeColunas);
+				linha.paraCada(function (celula, indiceDaColuna) {
+					clone.celulas[indiceDaLinha][indiceDaColuna] = celula.clonar(clone);
+				});
+			});
+		},
+		
+		clonarSequenciasVencedoras: function (clone) {
+			this.sequenciasVencedoras.paraCada(function (sequencia) {
+				var novaSequencia = []
+				sequencia.paraCada(function (celula) {
+					novaSequencia.push(clone.celulas[celula.linha][celula.coluna]);
+				});
+				clone.sequenciasVencedoras.push(novaSequencia);
+			});
 		},
 		
 		construirTabuleiro: function () {
@@ -63,11 +108,7 @@
 		
 		receberJogada: function (indiceDaColuna, jogador) {
 			var indiceDaLinha = this.celulas.ultimoIndice();
-			var celulaLivre = null;
-			var celulaAtual = this.fornecerPrimeiraCelulaDeBaixoNaColuna(indiceDaColuna);
-			while (celulaAtual.ocupada() && celulaAtual.dentroDoTabuleiro()) {
-				celulaAtual = celulaAtual.fornecerAdjacenteTopo();
-			}
+			var celulaAtual = this.fornecerPrimeiraCelulaLivreNaColuna(indiceDaColuna);
 			var jogadaPossivel = (celulaAtual.livre() && celulaAtual.dentroDoTabuleiro());
 			if (jogadaPossivel) {
 				celulaAtual.ocupar(jogador);
@@ -85,6 +126,14 @@
 			return this.celulas.ultimo()[coluna];
 		},
 		
+		fornecerPrimeiraCelulaLivreNaColuna: function (indiceDaColuna) {
+			var celula = this.fornecerPrimeiraCelulaDeBaixoNaColuna(indiceDaColuna);
+			while (celula.ocupada()) {
+				celula = celula.fornecerAdjacenteTopo();
+			}
+			return celula;
+		},
+		
 		fornecerCelula: function (linha, coluna) {
 			if (this.celulas.dentroDosLimites(linha) && this.celulas[linha].dentroDosLimites(coluna)) {
 				return this.celulas[linha][coluna];
@@ -92,16 +141,8 @@
 			return new CelulaForaDoTabuleiro(this);
 		},
 		
-		verificarSequenciaVencedora: function (ultimaCelulaOcupada) {
-			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.verificarSequenciasVencedoras());
-			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteTopo().verificarSequenciasVencedoras());
-			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteFundo().verificarSequenciasVencedoras());
-			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteEsquerda().verificarSequenciasVencedoras());
-			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteDireita().verificarSequenciasVencedoras());
-			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteTopoEsquerda().verificarSequenciasVencedoras());
-			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteTopoDireita().verificarSequenciasVencedoras());
-			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteFundoEsquerda().verificarSequenciasVencedoras());
-			this.sequenciasVencedoras.fundir(ultimaCelulaOcupada.fornecerAdjacenteFundoDireita().verificarSequenciasVencedoras());
+		verificarSequenciaVencedora: function (celula) {
+			this.sequenciasVencedoras.fundir(celula.selecionarSequenciasVencedoras());
 		},
 		
 		possuiSequenciaVencedora: function () {
@@ -114,6 +155,17 @@
 		
 		fimDeCelulas: function () {
 			return ((this.quantidadeDeLinhas * this.quantidadeDeColunas) === this.celulasOcupadas);
+		},
+		
+		fornecerJogadasPossiveis: function () {
+			var jogadasPossiveis = [];
+			for (var indiceDaColuna = 0; indiceDaColuna < this.quantidadeDeColunas; indiceDaColuna++) {
+				var celulaLivre = this.fornecerPrimeiraCelulaLivreNaColuna(indiceDaColuna);
+				if (celulaLivre.dentroDoTabuleiro()) {
+					jogadasPossiveis.push(celulaLivre);
+				}
+			}
+			return jogadasPossiveis;
 		}
 	});
 	
@@ -123,6 +175,12 @@
 			this.coluna = coluna;
 			this.tabuleiro = tabuleiro;
 			this.ocupante = null;
+		},
+		
+		clonar: function (tabuleiro) {
+			var clone = new Celula(this.linha, this.coluna, tabuleiro);
+			clone.ocupante = this.ocupante;
+			return clone;
 		},
 		
 		livre: function () {
@@ -145,36 +203,62 @@
 			return (this.ocupada() && celula.ocupada() && this.ocupante.igual(celula.ocupante));
 		},
 		
-		verificarSequenciasVencedoras: function () {
-			var quantidadeDeLigacoes = this.tabuleiro.quantidadeDeLigacoes;
-			var sequenciasDeVitoria = [];
-			var sequenciasVencedoras = [];
-			sequenciasDeVitoria.push(this.fornecerAdjacentesVerticalTopo(quantidadeDeLigacoes));
-			sequenciasDeVitoria.push(this.fornecerAdjacentesVerticalFundo(quantidadeDeLigacoes))
-			sequenciasDeVitoria.push(this.fornecerAdjacentesHorizontalEsquerda(quantidadeDeLigacoes));
-			sequenciasDeVitoria.push(this.fornecerAdjacentesHorizontalDireita(quantidadeDeLigacoes));
-			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalTopoEsquerda(quantidadeDeLigacoes));
-			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalTopoDireita(quantidadeDeLigacoes));
-			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalFundoEsquerda(quantidadeDeLigacoes));
-			sequenciasDeVitoria.push(this.fornecerAdjacentesDiagonalFundoDireita(quantidadeDeLigacoes));
-			sequenciasDeVitoria.paraCada(function (sequenciaDeVitoria) {
-				if (this.verificarSequenciaVencedora(sequenciaDeVitoria)) {
-					sequenciaDeVitoria.unshift(this);
-					sequenciasVencedoras.push(sequenciaDeVitoria);
-				}
-			}, this);
-			return sequenciasVencedoras;
+		ocupanteIgual: function (ocupante) {
+			return (this.ocupada() && this.ocupante.igual(ocupante));
 		},
 		
-		verificarSequenciaVencedora: function (sequencia) {
-			var possuiVencedora = true;
-			sequencia.paraCada(function (celula) {
-			if (!this.mesmoOcupante(celula)) {
-					possuiVencedora = false;
-					return;
+		selecionarSequencias: function (funcaoDeSelecao, argumento) {
+			var quantidadeDeLigacoes = this.tabuleiro.quantidadeDeLigacoes;
+			var sequencias = [];
+			var sequenciasSelecionadas = [];
+			sequencias.push(this.fornecerAdjacentesTopo(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacentesFundo(quantidadeDeLigacoes))
+			sequencias.push(this.fornecerAdjacentesEsquerda(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacentesDireita(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacentesTopoEsquerda(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacentesTopoDireita(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacentesFundoEsquerda(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacentesFundoDireita(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacenteTopo().fornecerAdjacentesFundo(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacenteFundo().fornecerAdjacentesTopo(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacenteEsquerda().fornecerAdjacentesDireita(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacenteDireita().fornecerAdjacentesEsquerda(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacenteTopoEsquerda().fornecerAdjacentesFundoDireita(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacenteTopoDireita().fornecerAdjacentesFundoEsquerda(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacenteFundoEsquerda().fornecerAdjacentesTopoDireita(quantidadeDeLigacoes));
+			sequencias.push(this.fornecerAdjacenteFundoDireita().fornecerAdjacentesTopoEsquerda(quantidadeDeLigacoes));
+			sequencias.paraCada(function (sequencia) {
+				if (funcaoDeSelecao(sequencia, argumento)) {
+					sequenciasSelecionadas.push(sequencia);
 				}
 			}, this);
-			return (possuiVencedora && (sequencia.length >= this.tabuleiro.quantidadeDeLigacoes));
+			return sequenciasSelecionadas;
+		},
+		
+		selecionarSequenciasVencedoras: function () {
+			return this.selecionarSequencias(this.selecionarSequenciaVencedora.vincularEscopo(this));
+		},
+		
+		selecionarSequenciaVencedora: function (sequencia) {
+			return sequencia.reduzir(function (possuiVencedora, celula) {
+				if (celula.foraDoTabuleiro() || !this.mesmoOcupante(celula)) {
+					return false;
+				}
+				return possuiVencedora;
+			}, true, this);
+		},
+		
+		selecionarSequenciasPossiveisDeVitoria: function (jogador) {
+			return this.selecionarSequencias(this.selecionarSequenciaPossivelDeVitoria.vincularEscopo(this), jogador);
+		},
+		
+		selecionarSequenciaPossivelDeVitoria: function (sequencia, jogador) {
+			return sequencia.reduzir(function (vitoriaPossivel, celula) {
+				if (celula.foraDoTabuleiro() || (celula.ocupada() && !celula.ocupanteIgual(jogador))) {
+					return false;
+				}
+				return vitoriaPossivel;
+			}, true, this);
 		},
 		
 		fornecerAdjacenteTopo: function () {
@@ -192,7 +276,7 @@
 		fornecerAdjacenteDireita: function () {
 			return this.fornecerAdjacentes(0, 1 ,1, true).primeiro();
 		},
-
+		
 		fornecerAdjacenteTopoEsquerda: function () {
 			return this.fornecerAdjacentes(-1, -1 ,1, true).primeiro();
 		},
@@ -209,36 +293,52 @@
 			return this.fornecerAdjacentes(1, 1 ,1, true).primeiro();
 		},
 		
-		fornecerAdjacentesVerticalTopo: function (quantidade) {
-			return this.fornecerAdjacentes(-1, 0, quantidade, false);
+		fornecerAdjacentesTopo: function (quantidade) {
+			var adjacentes = this.fornecerAdjacentes(-1, 0, quantidade, true);
+			adjacentes.unshift(this);
+			return adjacentes;
 		},
 		
-		fornecerAdjacentesVerticalFundo: function (quantidade) {
-			return this.fornecerAdjacentes(1, 0, quantidade, false);
+		fornecerAdjacentesFundo: function (quantidade) {
+			var adjacentes = this.fornecerAdjacentes(1, 0, quantidade, true);
+			adjacentes.unshift(this);
+			return adjacentes;
 		},
 		
-		fornecerAdjacentesHorizontalEsquerda: function (quantidade) {
-			return this.fornecerAdjacentes(0, -1, quantidade, false);
+		fornecerAdjacentesEsquerda: function (quantidade) {
+			var adjacentes = this.fornecerAdjacentes(0, -1, quantidade, true);
+			adjacentes.unshift(this);
+			return adjacentes;
 		},
 		
-		fornecerAdjacentesHorizontalDireita: function (quantidade) {
-			return this.fornecerAdjacentes(0, 1, quantidade, false);
+		fornecerAdjacentesDireita: function (quantidade) {
+			var adjacentes = this.fornecerAdjacentes(0, 1, quantidade, true);
+			adjacentes.unshift(this);
+			return adjacentes;
 		},
 		
-		fornecerAdjacentesDiagonalTopoEsquerda: function (quantidade) {
-			return this.fornecerAdjacentes(-1, -1, quantidade, false);
+		fornecerAdjacentesTopoEsquerda: function (quantidade) {
+			var adjacentes = this.fornecerAdjacentes(-1, -1, quantidade, true);
+			adjacentes.unshift(this);
+			return adjacentes;
 		},
 		
-		fornecerAdjacentesDiagonalTopoDireita: function (quantidade) {
-			return this.fornecerAdjacentes(-1, 1, quantidade, false);
+		fornecerAdjacentesTopoDireita: function (quantidade) {
+			var adjacentes = this.fornecerAdjacentes(-1, 1, quantidade, true);
+			adjacentes.unshift(this);
+			return adjacentes;
 		},
 		
-		fornecerAdjacentesDiagonalFundoEsquerda: function (quantidade) {
-			return this.fornecerAdjacentes(1, -1, quantidade, false);
+		fornecerAdjacentesFundoEsquerda: function (quantidade) {
+			var adjacentes = this.fornecerAdjacentes(1, -1, quantidade, true);
+			adjacentes.unshift(this);
+			return adjacentes;
 		},
 		
-		fornecerAdjacentesDiagonalFundoDireita: function (quantidade) {
-			return this.fornecerAdjacentes(1, 1, quantidade, false);
+		fornecerAdjacentesFundoDireita: function (quantidade) {
+			var adjacentes = this.fornecerAdjacentes(1, 1, quantidade, true);
+			adjacentes.unshift(this);
+			return adjacentes;
 		},
 		
 		fornecerAdjacentes: function (incrementoNaLinha, incrementoNaColuna, quantidade, incluirForaDoTabuleiro) {

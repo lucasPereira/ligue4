@@ -8,7 +8,7 @@
 			var tabuleiro = Linda.selecionar("table.tabuleiro");
 			tabuleiro.rows.paraCada(function (linha) {
 				linha.cells.paraCada(function (celula) {
-					celula.tratadorDeClique(this.selecionarCelula.vincularEscopo(this));
+					celula.tratadorDeClique(this.jogar.vincularEscopo(this));
 				}, this);
 			}, this);
 		},
@@ -21,12 +21,9 @@
 			//TODO
 		},
 		
-		selecionarCelula: function (evento) {
-			// if (Ligue4Modelo.instancia.humanoPodeJogar()) {
-			// 	Ligue4Modelo.instancia.jogar(evento.target.cellIndex);
-			// }
+		jogar: function (evento) {
+			// Ligue4Modelo.instancia.jogarHumano(evento.target.cellIndex);
 			Ligue4Modelo.instancia.jogar(evento.target.cellIndex);
-			//TODO: Recolocar IF.
 		},
 		
 		fecharMensagem: function () {

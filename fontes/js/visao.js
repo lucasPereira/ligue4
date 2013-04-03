@@ -16,8 +16,6 @@
 			var quantidadeDeColunas = Ligue4Modelo.instancia.quantidadeDeColunas;
 			for (var indiceDaLinha = 0; indiceDaLinha < quantidadeDeLinhas; indiceDaLinha++) {
 				for (var indiceDaColuna = 0; indiceDaColuna < quantidadeDeColunas; indiceDaColuna++) {
-					// celulaDoTabuleiro.textContent = String.formatar("%@:%@", indiceDaLinha, indiceDaColuna);
-					// TODO
 					linhaDoTabuleiro.appendChild(templateCelulaDoTabuleiro.cloneNode(true));
 				}
 				tabuleiro.appendChild(templateLinhaDoTabuleiro.cloneNode(true));
