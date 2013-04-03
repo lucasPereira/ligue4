@@ -5,7 +5,7 @@
 			this.observarTabuleiro();
 			this.observarJogadores();
 		},
-		
+
 		construirTabuleiro: function () {
 			var tabuleiro = Linda.selecionar("table.tabuleiro");
 			var templateLinhaDoTabuleiro = Linda.selecionar("template.linhaDoTabuleiro").content;
@@ -22,17 +22,17 @@
 				linhaDoTabuleiro.limpar();
 			}
 		},
-		
+
 		observarJogadores: function () {
 			var ordemDeJogadores = Ligue4Modelo.instancia.ordemDeJogadores;
 			ordemDeJogadores.observarAtualizacao(this.atualizarJogadorDaVez.vincularEscopo(this));
 			this.atualizarJogadorDaVez(ordemDeJogadores);
 		},
-		
+
 		observarTabuleiro: function () {
 			this.observarCelulas();
 		},
-		
+
 		observarCelulas: function () {
 			var celulas = Ligue4Modelo.instancia.tabuleiro.celulas;
 			celulas.paraCada(function (linha) {
@@ -41,12 +41,12 @@
 				}, this);
 			}, this);
 		},
-		
+
 		atualizarCelula: function (celula, propriedade, tipo, valorAntigo) {
 			var elementoCelula = Linda.selecionar("table.tabuleiro").rows[celula.linha].cells[celula.coluna];
 			elementoCelula.classList.add(celula.ocupante.identificador);
 		},
-		
+
 		atualizarJogadorDaVez: function (ordemDeJogadores) {
 			var jogadorDaVez = ordemDeJogadores.primeiro();
 			var itensJogadores = Linda.selecionarTodos("ul.jogadores > li");
@@ -55,19 +55,19 @@
 			}
 			Linda.selecionar(String.formatar("ul.jogadores > li.%@", jogadorDaVez.identificador)).classList.add("jogadorDaVez");
 		},
-		
+
 		declararVencedor: function (sequenciasVencedoras) {
 			this.mostrarMensagem(String.formatar("O jogador %@ venceu.", sequenciasVencedoras.primeiro().primeiro().ocupante.nome));
 		},
-		
+
 		declararEmpate: function () {
 			this.mostrarMensagem("O jogo empatou. Ninguém venceu :-(");
 		},
-		
+
 		declararColunaCheia: function () {
 			this.mostrarMensagem("A coluna está cheia. Escolha outra.");
 		},
-		
+
 		limparMensagem: function (secaoMensagem) {
 			var secaoMensagem = secaoMensagem || Linda.selecionar("section.mensagem");
 			var mensagens = secaoMensagem.selecionarTodos("p.mensagem");
@@ -75,7 +75,7 @@
 				mensagem.remove();
 			});
 		},
-		
+
 		mostrarMensagem: function (mensagem) {
 			var secaoMensagem = Linda.selecionar("section.mensagem");
 			var templateMensagem = Linda.selecionar("template.mensagem").content;
@@ -85,6 +85,6 @@
 			Ligue4Controle.instancia.adicionarTratadorDeMensagem();
 		}
 	});
-	
+
 	global.Ligue4Visao = Ligue4Visao;
 }(this));

@@ -11,7 +11,7 @@
 			this.ordemDeJogadores = [this.jogadores.humano, this.jogadores.computador];
 			this.ordemDeJogadores.embaralhar();
 		},
-		
+
 		jogar: function (coluna) {
 			var jogadorDaVez = this.ordemDeJogadores.primeiro();
 			var jogadaRealizada = this.tabuleiro.receberJogada(coluna, jogadorDaVez);
@@ -27,7 +27,7 @@
 			}
 			return jogadaRealizada;
 		},
-		
+
 		jogarHumano: function (coluna) {
 			if (this.humanoPodeJogar()) {
 				this.jogar(coluna);
@@ -35,7 +35,7 @@
 			}
 			return false;
 		},
-		
+
 		jogarComputador: function (coluna) {
 			if (this.computadorPodeJogar()) {
 				this.jogar(coluna);
@@ -43,20 +43,20 @@
 			}
 			return false;
 		},
-		
+
 		humanoPodeJogar: function () {
 			return (this.ordemDeJogadores.primeiro().igual(this.jogadores.humano) && this.podeJogar());
 		},
-		
+
 		computadorPodeJogar: function () {
 			return (this.ordemDeJogadores.primeiro().igual(this.jogadores.computador) && this.podeJogar());
 		},
-		
+
 		podeJogar: function () {
 			return !(this.tabuleiro.possuiSequenciaVencedora() || this.tabuleiro.fimDeCelulas());
 		}
 	});
-	
+
 	Tabuleiro = new Prototipo({
 		inicializar: function (quantidadeDeLinhas, quantidadeDeColunas, clonagem) {
 			this.sequenciasVencedoras = [];
@@ -69,7 +69,7 @@
 				this.construirTabuleiro();
 			}
 		},
-		
+
 		clonar: function () {
 			var clone = new Tabuleiro(this.quantidadeDeLinhas, this.quantidadeDeColunas, true);
 			clone.celulasOcupadas = this.celulasOcupadas;
@@ -77,7 +77,7 @@
 			this.clonarSequenciasVencedoras(clone);
 			return clone;
 		},
-		
+
 		clonarCelulas: function (clone) {
 			this.celulas.paraCada(function (linha, indiceDaLinha) {
 				clone.celulas[indiceDaLinha] = new Array(this.quantidadeDeColunas);
@@ -86,7 +86,7 @@
 				});
 			});
 		},
-		
+
 		clonarSequenciasVencedoras: function (clone) {
 			this.sequenciasVencedoras.paraCada(function (sequencia) {
 				var novaSequencia = []
@@ -96,7 +96,7 @@
 				clone.sequenciasVencedoras.push(novaSequencia);
 			});
 		},
-		
+
 		construirTabuleiro: function () {
 			for (var indiceDaLinha = 0; indiceDaLinha < this.quantidadeDeLinhas; indiceDaLinha++) {
 				this.celulas[indiceDaLinha] = new Array(this.quantidadeDeColunas);
@@ -105,7 +105,7 @@
 				}
 			}
 		},
-		
+
 		receberJogada: function (indiceDaColuna, jogador) {
 			var indiceDaLinha = this.celulas.ultimoIndice();
 			var celulaAtual = this.fornecerPrimeiraCelulaLivreNaColuna(indiceDaColuna);
@@ -117,15 +117,15 @@
 			}
 			return jogadaPossivel;
 		},
-		
+
 		fornecerPrimeiraCelulaDeCimaNaColuna: function (coluna) {
 			return this.celulas.primeiro()[coluna];
 		},
-		
+
 		fornecerPrimeiraCelulaDeBaixoNaColuna: function (coluna) {
 			return this.celulas.ultimo()[coluna];
 		},
-		
+
 		fornecerPrimeiraCelulaLivreNaColuna: function (indiceDaColuna) {
 			var celula = this.fornecerPrimeiraCelulaDeBaixoNaColuna(indiceDaColuna);
 			while (celula.ocupada()) {
@@ -133,30 +133,30 @@
 			}
 			return celula;
 		},
-		
+
 		fornecerCelula: function (linha, coluna) {
 			if (this.celulas.dentroDosLimites(linha) && this.celulas[linha].dentroDosLimites(coluna)) {
 				return this.celulas[linha][coluna];
 			}
 			return new CelulaForaDoTabuleiro(this);
 		},
-		
+
 		verificarSequenciaVencedora: function (celula) {
 			this.sequenciasVencedoras.fundir(celula.selecionarSequenciasVencedoras());
 		},
-		
+
 		possuiSequenciaVencedora: function () {
 			return (!this.sequenciasVencedoras.vazio());
 		},
-		
+
 		fornecerSequenciasVencedoras: function () {
 			return this.sequenciasVencedoras;
 		},
-		
+
 		fimDeCelulas: function () {
 			return ((this.quantidadeDeLinhas * this.quantidadeDeColunas) === this.celulasOcupadas);
 		},
-		
+
 		fornecerJogadasPossiveis: function () {
 			var jogadasPossiveis = [];
 			for (var indiceDaColuna = 0; indiceDaColuna < this.quantidadeDeColunas; indiceDaColuna++) {
@@ -168,7 +168,7 @@
 			return jogadasPossiveis;
 		}
 	});
-	
+
 	Celula = new Prototipo({
 		inicializar: function (linha, coluna, tabuleiro) {
 			this.linha = linha;
@@ -176,37 +176,37 @@
 			this.tabuleiro = tabuleiro;
 			this.ocupante = null;
 		},
-		
+
 		clonar: function (tabuleiro) {
 			var clone = new Celula(this.linha, this.coluna, tabuleiro);
 			clone.ocupante = this.ocupante;
 			return clone;
 		},
-		
+
 		livre: function () {
 			return (Linda.nulo(this.ocupante));
 		},
-		
+
 		liberar: function () {
 			this.ocupante = null;
 		},
-		
+
 		ocupada: function () {
 			return (!Linda.nulo(this.ocupante));
 		},
-		
+
 		ocupar: function (jogador) {
 			this.ocupante = jogador;
 		},
-		
+
 		mesmoOcupante: function (celula) {
 			return (this.ocupada() && celula.ocupada() && this.ocupante.igual(celula.ocupante));
 		},
-		
+
 		ocupanteIgual: function (ocupante) {
 			return (this.ocupada() && this.ocupante.igual(ocupante));
 		},
-		
+
 		selecionarSequencias: function (funcaoDeSelecao, argumento) {
 			var quantidadeDeLigacoes = this.tabuleiro.quantidadeDeLigacoes;
 			var sequencias = [];
@@ -234,11 +234,11 @@
 			}, this);
 			return sequenciasSelecionadas;
 		},
-		
+
 		selecionarSequenciasVencedoras: function () {
 			return this.selecionarSequencias(this.selecionarSequenciaVencedora.vincularEscopo(this));
 		},
-		
+
 		selecionarSequenciaVencedora: function (sequencia) {
 			return sequencia.reduzir(function (possuiVencedora, celula) {
 				if (celula.foraDoTabuleiro() || !this.mesmoOcupante(celula)) {
@@ -247,11 +247,11 @@
 				return possuiVencedora;
 			}, true, this);
 		},
-		
+
 		selecionarSequenciasPossiveisDeVitoria: function (jogador) {
 			return this.selecionarSequencias(this.selecionarSequenciaPossivelDeVitoria.vincularEscopo(this), jogador);
 		},
-		
+
 		selecionarSequenciaPossivelDeVitoria: function (sequencia, jogador) {
 			return sequencia.reduzir(function (vitoriaPossivel, celula) {
 				if (celula.foraDoTabuleiro() || (celula.ocupada() && !celula.ocupanteIgual(jogador))) {
@@ -260,87 +260,87 @@
 				return vitoriaPossivel;
 			}, true, this);
 		},
-		
+
 		fornecerAdjacenteTopo: function () {
 			return this.fornecerAdjacentes(-1, 0 ,1, true).primeiro();
 		},
-		
+
 		fornecerAdjacenteFundo: function () {
 			return this.fornecerAdjacentes(1, 0 ,1, true).primeiro();
 		},
-		
+
 		fornecerAdjacenteEsquerda: function () {
 			return this.fornecerAdjacentes(0, -1 ,1, true).primeiro();
 		},
-		
+
 		fornecerAdjacenteDireita: function () {
 			return this.fornecerAdjacentes(0, 1 ,1, true).primeiro();
 		},
-		
+
 		fornecerAdjacenteTopoEsquerda: function () {
 			return this.fornecerAdjacentes(-1, -1 ,1, true).primeiro();
 		},
-		
+
 		fornecerAdjacenteTopoDireita: function () {
 			return this.fornecerAdjacentes(-1, 1 ,1, true).primeiro();
 		},
-		
+
 		fornecerAdjacenteFundoEsquerda: function () {
 			return this.fornecerAdjacentes(1, -1 ,1, true).primeiro();
 		},
-		
+
 		fornecerAdjacenteFundoDireita: function () {
 			return this.fornecerAdjacentes(1, 1 ,1, true).primeiro();
 		},
-		
+
 		fornecerAdjacentesTopo: function (quantidade) {
 			var adjacentes = this.fornecerAdjacentes(-1, 0, quantidade, true);
 			adjacentes.unshift(this);
 			return adjacentes;
 		},
-		
+
 		fornecerAdjacentesFundo: function (quantidade) {
 			var adjacentes = this.fornecerAdjacentes(1, 0, quantidade, true);
 			adjacentes.unshift(this);
 			return adjacentes;
 		},
-		
+
 		fornecerAdjacentesEsquerda: function (quantidade) {
 			var adjacentes = this.fornecerAdjacentes(0, -1, quantidade, true);
 			adjacentes.unshift(this);
 			return adjacentes;
 		},
-		
+
 		fornecerAdjacentesDireita: function (quantidade) {
 			var adjacentes = this.fornecerAdjacentes(0, 1, quantidade, true);
 			adjacentes.unshift(this);
 			return adjacentes;
 		},
-		
+
 		fornecerAdjacentesTopoEsquerda: function (quantidade) {
 			var adjacentes = this.fornecerAdjacentes(-1, -1, quantidade, true);
 			adjacentes.unshift(this);
 			return adjacentes;
 		},
-		
+
 		fornecerAdjacentesTopoDireita: function (quantidade) {
 			var adjacentes = this.fornecerAdjacentes(-1, 1, quantidade, true);
 			adjacentes.unshift(this);
 			return adjacentes;
 		},
-		
+
 		fornecerAdjacentesFundoEsquerda: function (quantidade) {
 			var adjacentes = this.fornecerAdjacentes(1, -1, quantidade, true);
 			adjacentes.unshift(this);
 			return adjacentes;
 		},
-		
+
 		fornecerAdjacentesFundoDireita: function (quantidade) {
 			var adjacentes = this.fornecerAdjacentes(1, 1, quantidade, true);
 			adjacentes.unshift(this);
 			return adjacentes;
 		},
-		
+
 		fornecerAdjacentes: function (incrementoNaLinha, incrementoNaColuna, quantidade, incluirForaDoTabuleiro) {
 			var adjacentes = [];
 			var linhaAtual = this.linha;
@@ -355,42 +355,42 @@
 			}
 			return adjacentes;
 		},
-		
+
 		foraDoTabuleiro: function () {
 			return false;
 		},
-		
+
 		dentroDoTabuleiro: function () {
 			return true;
 		}
 	});
-	
+
 	CelulaForaDoTabuleiro = new Prototipo({
 		Estende: Celula,
-		
+
 		inicializar: function (tabuleiro) {
 			this.tabuleiro = tabuleiro;
 		},
-		
+
 		foraDoTabuleiro: function () {
 			return true;
 		},
-		
+
 		dentroDoTabuleiro: function () {
 			return false;
 		}
 	});
-	
+
 	Jogador = new Prototipo({
 		inicializar: function (nome, identificador) {
 			this.nome = nome;
 			this.identificador = identificador;
 		},
-		
+
 		igual: function (outro) {
 			return (this.identificador === outro.identificador);
 		}
 	});
-	
+
 	global.Ligue4Modelo = Ligue4Modelo;
 }(this));

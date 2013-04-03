@@ -4,7 +4,7 @@
 			Ligue4Modelo.instancia.ordemDeJogadores.observarAtualizacao(this.jogar.vincularEscopo(this));
 			this.minimax = new Minimax(new Nodo(Ligue4Modelo.instancia.tabuleiro.clonar()), 10);
 		},
-		
+
 		jogar: function (ordemDosJogadores) {
 			// Ligue4Modelo.instancia.jogarComputador();
 			// TODO
@@ -18,16 +18,16 @@
 			this.profundidade = profundidade;
 			this.construirArvore();
 		},
-		
+
 		construirArvore: function (profundidade) {
 			
 		},
-		
+
 		expandirArvore: function (profundidade) {
 			
 		}
 	});
-	
+
 	Nodo = new Prototipo({
 		inicializar: function (tabuleiro, jogador) {
 			this.alfa = Number.maisInfinito;
@@ -36,15 +36,15 @@
 			this.jogador = jogador;
 			this.filhos = [];
 		},
-		
+
 		calcularMinimo: function () {
 			
 		},
-		
+
 		calcularMaximo: function () {
 			
 		},
-		
+
 		calcularHeuristica: function (valorInicia) {
 			var jogadasPossiveis = this.tabuleiro.fornecerJogadasPossiveis();
 			var heuristica = jogadasPossiveis.reduzir(function (valorDaHeuristica, celula) {
@@ -58,11 +58,11 @@
 				return (valorDaHeuristica + heuristicaDasSequencias);
 			}, 0);
 		},
-		
+
 		adicionarFilho: function (nodo) {
 			this.filhos.push(nodo);
 		}
 	});
-	
+
 	global.Ligue4Ia = Ligue4Ia;
 }(this));
