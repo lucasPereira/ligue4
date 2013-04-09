@@ -106,3 +106,91 @@ section.mensagem > p.mensagem {
 section.mensagem > p.mensagem:hover {
 	cursor: pointer;
 }
+
+section.arvore {
+	margin: 50px;
+	display: -webkit-flex;
+	-webkit-flex-direction: row;
+	-webkit-flex-wrap: wrap;
+	-webkit-justify-content: flex-start;
+	-webkit-align-items: flex-start;
+	-webkit-align-content: flex-start;
+}
+
+section.arvore > div.nodo > table.tabuleiro {
+	height: 200px;
+	width: 200px;
+}
+
+section.arvore > div.nodo {
+	margin: 0 20px 20px 0;
+}
+
+section.estatisticas {
+	margin: 50px;
+}
+
+section.estatisticas > dl > dt {
+	font-weight: bold;
+	display: inline-block;
+}
+
+section.estatisticas > dl > dd { 
+	display: inline-block;
+	margin-right: 30px;
+	margin-left: 5px;
+}
+
+input[type="text"] {
+	border-color: #888;
+	border-style: solid;
+	border-width: 1px;
+	color: #333;
+	padding: 3px;
+	text-align: center;
+	width: 25px;
+}
+
+label {
+	display: block;
+	margin-right: 30px;
+}
+
+label > input {
+	margin-right: 10px;
+}
+
+section.configuracoes {
+	margin: 50px;
+	display: -webkit-flex;
+	-webkit-flex-direction: row;
+	-webkit-flex-wrap: wrap;
+	-webkit-justify-content: flex-start;
+	-webkit-align-items: flex-start;
+	-webkit-align-content: flex-start;
+}
+
+button {
+	background-color: #444;
+	background-image: -webkit-linear-gradient(90deg, #666, #444);
+	color: #FFF;
+	margin: auto;
+	text-align: center;
+	padding: 7px;
+}
+
+button:hover {
+	background-image: -webkit-linear-gradient(90deg, #888, #555);
+}
+
+button:active {
+	background-image: -webkit-linear-gradient(90deg, #555, #888);
+}
+
+button:disabled,
+button:hover:disabled,
+button:active:disabled {
+	background-color: #444;
+	background-image: none;
+	color: #FFF;
+}

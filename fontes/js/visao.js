@@ -2,8 +2,9 @@
 	Ligue4Visao = new PrototipoUnico({
 		inicializarUnico: function () {
 			this.construirTabuleiro();
-			this.observarTabuleiro();
-			this.observarJogadores();
+			// this.observarTabuleiro();
+			// this.observarJogadores();
+			this.observarNodos();
 		},
 
 		construirTabuleiro: function () {
@@ -11,7 +12,6 @@
 			var templateLinhaDoTabuleiro = Linda.selecionar("template.linhaDoTabuleiro").content;
 			var linhaDoTabuleiro = templateLinhaDoTabuleiro.selecionar("tr.linhaDoTabuleiro");
 			var templateCelulaDoTabuleiro = linhaDoTabuleiro.selecionar("template.celulaDoTabuleiro").content;
-			var celulaDoTabuleiro = templateCelulaDoTabuleiro.selecionar("td.celulaDoTabuleiro");
 			var quantidadeDeLinhas = Ligue4Modelo.instancia.quantidadeDeLinhas;
 			var quantidadeDeColunas = Ligue4Modelo.instancia.quantidadeDeColunas;
 			for (var indiceDaLinha = 0; indiceDaLinha < quantidadeDeLinhas; indiceDaLinha++) {
@@ -23,9 +23,46 @@
 			}
 		},
 
+		construirArvoreMinimax: function (minimax) {
+			var nodos = [minimax.raiz];
+			var secaoArvore = Linda.selecionar("section.arvore");
+			secaoArvore.limpar();
+			var templateNodo = secaoArvore.selecionar("template.nodo").content;
+			var divisaoNodo = templateNodo.selecionar("div.nodo");
+			var tabelaTabuleiro = divisaoNodo.selecionar("table.tabuleiro");
+			var alfaBeta = divisaoNodo.selecionar("p.alfaBeta");
+			var jogador = divisaoNodo.selecionar("p.jogador");
+			var templateLinhaDoTabuleiro = tabelaTabuleiro.selecionar("template.linhaDoTabuleiro").content;
+			var linhaLinhaDoTabuleiro = templateLinhaDoTabuleiro.selecionar("tr.linhaDoTabuleiro");
+			var templateCelulaDoTabuleiro = linhaLinhaDoTabuleiro.selecionar("template.celulaDoTabuleiro").content;
+			var celulaCelulaDoTabuleiro = templateCelulaDoTabuleiro.selecionar("td.celulaDoTabuleiro");
+			while (nodos.length > 0) {
+				var nodoAtual = nodos.shift();
+				nodoAtual.tabuleiro.celulas.paraCada(function (linha) {
+					linha.paraCada(function (celula) {
+						if (celula.ocupada()) {
+							celulaCelulaDoTabuleiro.classList.add(celula.ocupante.identificador);
+						}
+						linhaLinhaDoTabuleiro.appendChild(templateCelulaDoTabuleiro.cloneNode(true));
+						if (celula.ocupada()) {
+							celulaCelulaDoTabuleiro.classList.remove(celula.ocupante.identificador);
+						}
+					});
+					tabelaTabuleiro.appendChild(templateLinhaDoTabuleiro.cloneNode(true));
+					linhaLinhaDoTabuleiro.limpar();
+				});
+				alfaBeta.textContent = String.formatar("%@/%@", nodoAtual.alfa, nodoAtual.beta);
+				jogador.textContent = nodoAtual.jogador.nome;
+				secaoArvore.appendChild(templateNodo.cloneNode(true));
+				secaoArvore.appendChild(Linda.documento.createElement("hr"));
+				nodos.fundir(nodoAtual.filhos);
+				tabelaTabuleiro.limpar();
+			}
+		},
+
 		observarJogadores: function () {
 			var ordemDeJogadores = Ligue4Modelo.instancia.ordemDeJogadores;
-			ordemDeJogadores.observarAtualizacao(this.atualizarJogadorDaVez.vincularEscopo(this));
+			ordemDeJogadores.observarAtualizacao(this.atualizarJogadorDaVez.vincularEscopo(this), "0");
 			this.atualizarJogadorDaVez(ordemDeJogadores);
 		},
 
@@ -42,7 +79,16 @@
 			}, this);
 		},
 
-		atualizarCelula: function (celula, propriedade, tipo, valorAntigo) {
+		observarNodos: function () {
+			EstrategiaMinimax.observarAtualizacao(this.atualizarNodos.vincularEscopo(this));
+		},
+
+		atualizarNodos: function (minimax, propriedade) {
+			var nodos = Linda.selecionar(String.formatar("section.estatisticas > dl > dd.%@", propriedade));
+			nodos.textContent = minimax[propriedade];
+		},
+
+		atualizarCelula: function (celula) {
 			var elementoCelula = Linda.selecionar("table.tabuleiro").rows[celula.linha].cells[celula.coluna];
 			elementoCelula.classList.add(celula.ocupante.identificador);
 		},

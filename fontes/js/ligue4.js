@@ -7,8 +7,20 @@
 		inicializarModulos: function () {
 			Ligue4Modelo.instancia();
 			Ligue4Visao.instancia();
-			Ligue4Controle.instancia();
 			Ligue4Ia.instancia();
+			Ligue4Controle.instancia();
+			Ligue4Visao.instancia.atualizarJogadorDaVez(Ligue4Modelo.instancia.ordemDeJogadores);
+		},
+
+		atualizarCelula: function (celula) {
+			Ligue4Visao.instancia.atualizarCelula(celula);
+		},
+
+		atualizarJogador: function (ordemDeJogadores) {
+			Ligue4Visao.instancia.atualizarJogadorDaVez(ordemDeJogadores);
+			Linda.janela.setTimeout(function () {
+				Ligue4Ia.instancia.receberJogada(ordemDeJogadores);
+			}, 0);
 		},
 
 		declararVencedor: function (sequenciasVencedoras) {

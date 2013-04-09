@@ -345,6 +345,18 @@
 	"use strict";
 
 	Array.implementar({
+		clonar: function () {
+			var clone = new Array(this.length);
+			for (var indice = 0, tamanho = this.length; indice < tamanho; indice++) {
+				var elemento = this[indice];
+				if (Linda.tipoDe(elemento.clonar, Function)) {
+					elemento = elemento.clonar();
+				}
+				clone[indice] = elemento;
+			}
+			return clone;
+		},
+
 		contem: function (valor) {
 			return (this.indexOf(valor) >= 0);
 		},
@@ -409,6 +421,24 @@
 			funcaoDeReducao = funcaoDeReducao.vincularEscopo(escopo);
 			valorAtual = valorAtual || 0;
 			for (var indice = 0; indice < this.length; indice++) {
+				valorAtual = funcaoDeReducao(valorAtual, this[indice], indice);
+			}
+			return valorAtual;
+		},
+
+		reduzirSemPrimeiro: function (funcaoDeReducao, valorAtual, escopo) {
+			funcaoDeReducao = funcaoDeReducao.vincularEscopo(escopo);
+			valorAtual = valorAtual || 0;
+			for (var indice = 1; indice < this.length; indice++) {
+				valorAtual = funcaoDeReducao(valorAtual, this[indice], indice);
+			}
+			return valorAtual;
+		},
+
+		reduzirSemUltimo: function (funcaoDeReducao, valorAtual, escopo) {
+			funcaoDeReducao = funcaoDeReducao.vincularEscopo(escopo);
+			valorAtual = valorAtual || 0;
+			for (var indice = 0; indice < (this.length - 1); indice++) {
 				valorAtual = funcaoDeReducao(valorAtual, this[indice], indice);
 			}
 			return valorAtual;
@@ -531,19 +561,16 @@
 	"use strict";
 
 	var Prototipo = function Prototipo(corpoDoPrototipo) {
-		var inicializar = corpoDoPrototipo.inicializar;
-		var inicializa = Linda.instanciaDe(inicializar, Function);
 		var Estende = corpoDoPrototipo.Estende;
 		var estende = Linda.instanciaDe(Estende, Function);
 		var NovoPrototipo = function Objeto() {
-			if (inicializa) {
-				inicializar.aplicarComEscopo(this, arguments);
+			if (Linda.instanciaDe(this.inicializar, Function)) {
+				this.inicializar.aplicarComEscopo(this, arguments);
 			}
 		};
 		if (estende) {
 			NovoPrototipo.prototype = new Estende();
 		}
-		delete corpoDoPrototipo.inicializar;
 		delete corpoDoPrototipo.Estende;
 		NovoPrototipo.implementar(corpoDoPrototipo);
 		return NovoPrototipo;
@@ -1114,8 +1141,13 @@
 
 	Node.implementar({
 		limpar: function () {
-			while (this.hasChildNodes()) {
-				this.removeChild(this.firstChild);
+			var nodosFilhos = this.children;
+			for (var indice = 0; indice < nodosFilhos.length; indice++) {
+				var nodoFilho = nodosFilhos[indice]
+				if (!Linda.instanciaDe(nodoFilho, HTMLTemplateElement)) {
+					this.removeChild(nodoFilho);
+					indice--;
+				}
 			}
 		},
 

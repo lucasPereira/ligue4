@@ -22,6 +22,8 @@
 					Ligue4.instancia.declararEmpate();
 				}
 				this.ordemDeJogadores.push(this.ordemDeJogadores.shift());
+				Ligue4.instancia.atualizarCelula(this.tabuleiro.ultimaJogada);
+				Ligue4.instancia.atualizarJogador(this.ordemDeJogadores);
 			} else {
 				Ligue4.instancia.declararColunaCheia();
 			}
@@ -68,6 +70,7 @@
 			if (Linda.nuloOuIndefinido(clonagem) || !clonagem) {
 				this.construirTabuleiro();
 			}
+			this.ultimaJogada = null;
 		},
 
 		clonar: function () {
@@ -114,6 +117,7 @@
 				celulaAtual.ocupar(jogador);
 				this.celulasOcupadas++;
 				this.verificarSequenciaVencedora(celulaAtual);
+				this.ultimaJogada = celulaAtual;
 			}
 			return jogadaPossivel;
 		},
@@ -159,13 +163,19 @@
 
 		fornecerJogadasPossiveis: function () {
 			var jogadasPossiveis = [];
-			for (var indiceDaColuna = 0; indiceDaColuna < this.quantidadeDeColunas; indiceDaColuna++) {
-				var celulaLivre = this.fornecerPrimeiraCelulaLivreNaColuna(indiceDaColuna);
-				if (celulaLivre.dentroDoTabuleiro()) {
-					jogadasPossiveis.push(celulaLivre);
+			if (!this.possuiSequenciaVencedora()) {
+				for (var indiceDaColuna = 0; indiceDaColuna < this.quantidadeDeColunas; indiceDaColuna++) {
+					var celulaLivre = this.fornecerPrimeiraCelulaLivreNaColuna(indiceDaColuna);
+					if (celulaLivre.dentroDoTabuleiro()) {
+						jogadasPossiveis.push(celulaLivre);
+					}
 				}
 			}
 			return jogadasPossiveis;
+		},
+
+		ultimaJogadaFoi: function (outraCelula) {
+			return this.ultimaJogada.igual(outraCelula);
 		}
 	});
 
@@ -181,6 +191,10 @@
 			var clone = new Celula(this.linha, this.coluna, tabuleiro);
 			clone.ocupante = this.ocupante;
 			return clone;
+		},
+
+		igual: function (outra) {
+			return (this.linha == outra.linha && this.coluna == outra.coluna);
 		},
 
 		livre: function () {

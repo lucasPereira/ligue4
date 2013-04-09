@@ -33,5 +33,44 @@
 				<li class="computador">Computador</li>
 			</ul>
 		</section>
+		<section class="estatisticas">
+			<dl>
+				<dt>Nodos construídos</dt>
+				<dd class="nodosConstruidos"></dd>
+				<dt>Nodos processados</dt>
+				<dd class="nodosProcessados"></dd>
+				<dt>Total de nodos construídos</dt>
+				<dd class="totalDeNodosConstruidos"></dd>
+				<dt>Total de nodos processados</dd>
+				<dd class="totalDeNodosProcessados"></dd>
+			</dl>
+		</section>
+		<section class="configuracoes">
+			<div>
+				<label><input name="estrategiaMinimax" value="minimax" checked type="radio" />Minimax</label>
+				<label><input name="estrategiaMinimax" value="minimaxComHeuristica" type="radio" />Minimax com heuristica</label>
+				<label><input name="estrategiaMinimax" value="minimaxComHeuristicaComPoda" type="radio" />Minimax com heuristica e poda</label>
+			</div>
+			<label>Profundidade: <input name="profundidade" type="text" value="2" /></label>
+			<label><input name="construirArvore" type="checkbox" />Construir árvore</label>
+			<label><button type="button" class="iniciarIa">Iniciar IA</button>
+		</section>
+		<section class="arvore">
+			<template class="nodo">
+				<div class="nodo">
+					<table class="tabuleiro">
+						<template class="linhaDoTabuleiro">
+							<tr class="linhaDoTabuleiro">
+								<template class="celulaDoTabuleiro">
+									<td class="celulaDoTabuleiro"></td>
+								</template>
+							</tr>
+						</template>
+					</table>
+					<p class="alfaBeta"></p>
+					<p class="jogador"></p>
+				</div>
+			</template>
+		</section>
 	</body>
 </html>
