@@ -8,14 +8,15 @@
 	var Ligue4Ia = Classe.criarSingleton({
 		inicializar: function () {
 			EstrategiaNodo.fixarEstrategia(Nodo);
+			Minimax.fixarVencedorDesejado(Ligue4Modelo.instancia.jogadores.computador);
 			this.construirArvore = false;
-			this.profundidade = 5;
+			this.profundidade = 4;
 			//TODO: construirSubArvore: evitar clonagem de ordemDeJogadores.
 			//TODO: verificar efetividade do método clonar do tabuleiro.
 		},
 
 		receberJogada: function (ordemDeJogadores) {
-			if (ordemDeJogadores.primeiro.igual(Ligue4Modelo.instancia.jogadores.computador)) {
+			if (ordemDeJogadores.primeiro.igual(Minimax.vencedorDesejado)) {
 				Minimax.reiniciarNodosConstruidosProcessados();
 				var tabuleiro = Ligue4Modelo.instancia.tabuleiro.clonar();
 				var minimax = new Minimax(tabuleiro, ordemDeJogadores);
@@ -57,6 +58,11 @@
 		nodosProcessados: 0,
 		totalDeNodosConstruidos: 0,
 		totalDeNodosProcessados: 0,
+		vencedorDesejado: null,
+
+		fixarVencedorDesejado: function (vencedorDesejado) {
+			this.vencedorDesejado = vencedorDesejado;
+		},
 
 		reiniciarNodosConstruidosProcessados: function () {
 			this.nodosConstruidos = 0;
@@ -143,8 +149,7 @@
 		calcularCondicaoDeVitoria: function () {
 			if (this.tabuleiro.possuiSequenciaVencedora()) {
 				var profundiadeMaxima = 42;
-				var vencedorDesejado = Ligue4Modelo.instancia.jogadores.computador;
-				var computadorVenceu = this.tabuleiro.fornecerSequenciasVencedoras().primeiro.primeiro.ocupanteIgual(vencedorDesejado);
+				var computadorVenceu = this.tabuleiro.fornecerSequenciasVencedoras().primeiro.primeiro.ocupanteIgual(Minimax.vencedorDesejado);
 				return ((profundiadeMaxima - this.profundidade) * ((computadorVenceu) ? 1 : -1));
 			} else {
 				return 0;
@@ -169,6 +174,10 @@
 
 	var NodoComHeuristica = Classe.criar({
 		estende: Nodo,
+
+		inicializar: function (tabuleiro, jogador) {
+			Nodo.prototipo.inicializar.chamarComEscopo(this, tabuleiro, jogador);
+		},
 
 		calcularPontuacao: function () {
 			return (this.calcularCondicaoDeVitoria() + this.calcularHeuristica);

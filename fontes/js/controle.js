@@ -13,6 +13,7 @@
 
 	var Ligue4Controle = Classe.criarSingleton({
 		inicializar: function () {
+			this.tratadoresDeCelula = [];
 			this.adicionarTratadores();
 		},
 
@@ -20,7 +21,8 @@
 			var tabuleiro = Linda.selecionar("table.tabuleiro");
 			tabuleiro.rows.paraCada(function (linha) {
 				linha.cells.paraCada(function (celula) {
-					celula.tratadorDeClique(this.jogar.vincularEscopo(this));
+					var tratador = celula.tratadorDeClique(this.jogar.vincularEscopo(this));
+					this.tratadoresDeCelula.push(tratador);
 				}, this);
 			}, this);
 			Linda.selecionar("section.configuracoes button.iniciarIa").tratadorDeClique(this.iniciarIa.vincularEscopo(this));
@@ -28,6 +30,12 @@
 
 		adicionarTratadorDeMensagem: function () {
 			Linda.selecionar("section.mensagem > p.mensagem").tratadorDeClique(this.fecharMensagem.vincularEscopo(this));
+		},
+
+		removerTratadores: function () {
+			this.tratadoresDeCelula.paraCada(function (tratador) {
+				tratador.remover();
+			});
 		},
 
 		iniciarIa: function () {

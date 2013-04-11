@@ -147,7 +147,7 @@
 			if (this.celulas.dentroDosLimites(linha) && this.celulas[linha].dentroDosLimites(coluna)) {
 				return this.celulas[linha][coluna];
 			}
-			return new CelulaForaDoTabuleiro(this);
+			return new CelulaForaDoTabuleiro(linha, coluna, this);
 		},
 
 		verificarSequenciaVencedora: function (celula) {
@@ -387,8 +387,8 @@
 	var CelulaForaDoTabuleiro = Classe.criar({
 		estende: Celula,
 
-		inicializar: function (tabuleiro) {
-			this.tabuleiro = tabuleiro;
+		inicializar: function (linha, coluna, tabuleiro) {
+			Celula.prototipo.inicializar.chamarComEscopo(this, linha, coluna, tabuleiro);
 		},
 
 		foraDoTabuleiro: function () {
