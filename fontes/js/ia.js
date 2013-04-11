@@ -1,17 +1,24 @@
+/*global Classe*/
+/*global Ligue4Modelo*/
+/*global Ligue4Visao*/
+
 (function (global) {
-	Ligue4Ia = new PrototipoUnico({
-		inicializarUnico: function () {
-			EstrategiaMinimax.fixarEstrategia(Minimax);
-			this.construirArvore = true;
-			this.profundidade = 2;
+	"use strict";
+
+	var Ligue4Ia = Classe.criarSingleton({
+		inicializar: function () {
+			EstrategiaNodo.fixarEstrategia(Nodo);
+			this.construirArvore = false;
+			this.profundidade = 5;
+			//TODO: construirSubArvore: evitar clonagem de ordemDeJogadores.
+			//TODO: verificar efetividade do método clonar do tabuleiro.
 		},
 
 		receberJogada: function (ordemDeJogadores) {
-			if (ordemDeJogadores.primeiro().igual(Ligue4Modelo.instancia.jogadores.computador)) {
+			if (ordemDeJogadores.primeiro.igual(Ligue4Modelo.instancia.jogadores.computador)) {
+				Minimax.reiniciarNodosConstruidosProcessados();
 				var tabuleiro = Ligue4Modelo.instancia.tabuleiro.clonar();
-				var ordemDeJogadores = Ligue4Modelo.instancia.ordemDeJogadores.clonar();
-				EstrategiaMinimax.reiniciarNodosConstruidosProcessados();
-				var minimax = new EstrategiaMinimax(tabuleiro, ordemDeJogadores);
+				var minimax = new Minimax(tabuleiro, ordemDeJogadores);
 				minimax.construirArvore(ordemDeJogadores, this.profundidade);
 				var jogada = minimax.jogar();
 				Ligue4Modelo.instancia.jogarComputador(jogada.coluna);
@@ -21,11 +28,10 @@
 			}
 		}
 	});
-	
 
-	Minimax = new Prototipo({
+	var Minimax = Classe.criar({
 		inicializar: function (tabuleiro, ordemDeJogadores) {
-			this.raiz = new Nodo(tabuleiro, ordemDeJogadores.ultimo());
+			this.raiz = new EstrategiaNodo(tabuleiro, ordemDeJogadores.ultimo);
 			this.nodoAtual = this.raiz;
 		},
 
@@ -46,9 +52,7 @@
 		}
 	});
 
-	EstrategiaMinimax = new Prototipo({});
-
-	EstrategiaMinimax.estender({
+	Minimax.estender({
 		nodosConstruidos: 0,
 		nodosProcessados: 0,
 		totalDeNodosConstruidos: 0,
@@ -57,14 +61,18 @@
 		reiniciarNodosConstruidosProcessados: function () {
 			this.nodosConstruidos = 0;
 			this.nodosProcessados = 0;
-		},
+		}
+	});
 
+	var EstrategiaNodo = Classe.criar({});
+
+	EstrategiaNodo.estender({
 		fixarEstrategia: function (Estrategia) {
 			this.implementar(Estrategia.prototype);
 		}
 	});
 
-	Nodo = new Prototipo({
+	var Nodo = Classe.criar({
 		inicializar: function (tabuleiro, jogador) {
 			this.alfa = Number.menosInfinito;
 			this.beta = Number.maisInfinito;
@@ -73,21 +81,23 @@
 			this.tabuleiro = tabuleiro;
 			this.jogador = jogador;
 			this.filhos = [];
-			EstrategiaMinimax.totalDeNodosConstruidos++;
-			EstrategiaMinimax.nodosConstruidos++;
+			this.profundidade = 0;
+			Minimax.totalDeNodosConstruidos++;
+			Minimax.nodosConstruidos++;
 		},
 
 		construirSubArvore: function (ordemDeJogadores, profundidade) {
 			if (profundidade > 0) {
 				var jogadasPossiveis = this.tabuleiro.fornecerJogadasPossiveis();
 				var novaOrdemDeJogadores = ordemDeJogadores.clonar();
-				var jogadorDaVez = ordemDeJogadores.primeiro();
-				var novaProfundidade = profundidade - 1;
+				var jogadorDaVez = ordemDeJogadores.primeiro;
+				var novaProfundidade = (profundidade - 1);
+				this.profundidade = profundidade;
 				novaOrdemDeJogadores.push(novaOrdemDeJogadores.shift());
 				jogadasPossiveis.paraCada(function (celula) {
 					var tabuleiroClone = this.tabuleiro.clonar();
 					tabuleiroClone.receberJogada(celula.coluna, jogadorDaVez);
-					var nodoFilho = new Nodo(tabuleiroClone, jogadorDaVez);
+					var nodoFilho = new EstrategiaNodo(tabuleiroClone, jogadorDaVez);
 					this.adicionarFilho(nodoFilho);
 					nodoFilho.construirSubArvore(novaOrdemDeJogadores, novaProfundidade);
 				}, this);
@@ -95,13 +105,13 @@
 		},
 
 		calcularMinimo: function () {
-			EstrategiaMinimax.nodosProcessados++;
-			EstrategiaMinimax.totalDeNodosProcessados++;
+			Minimax.nodosProcessados++;
+			Minimax.totalDeNodosProcessados++;
 			if (this.filhos.vazio()) {
 				this.beta = this.calcularPontuacao();
 				return this.beta;
 			}
-			var primeiroFilho = this.filhos.primeiro();
+			var primeiroFilho = this.filhos.primeiro;
 			primeiroFilho.calcularMaximo();
 			this.nodoBeta = this.filhos.reduzirSemPrimeiro(function (nodoEscolhido, nodoAtual) {
 				return (nodoAtual.calcularMaximo() < nodoEscolhido.alfa) ? nodoAtual : nodoEscolhido;
@@ -111,13 +121,13 @@
 		},
 
 		calcularMaximo: function () {
-			EstrategiaMinimax.nodosProcessados++;
-			EstrategiaMinimax.totalDeNodosProcessados++;
+			Minimax.nodosProcessados++;
+			Minimax.totalDeNodosProcessados++;
 			if (this.filhos.vazio()) {
 				this.alfa = this.calcularPontuacao();
 				return this.alfa;
 			}
-			var primeiroFilho = this.filhos.primeiro();
+			var primeiroFilho = this.filhos.primeiro;
 			primeiroFilho.calcularMinimo();
 			this.nodoAlfa = this.filhos.reduzirSemPrimeiro(function (nodoEscolhido, nodoAtual) {
 				return (nodoAtual.calcularMinimo() > nodoEscolhido.beta) ? nodoAtual : nodoEscolhido;
@@ -132,9 +142,10 @@
 
 		calcularCondicaoDeVitoria: function () {
 			if (this.tabuleiro.possuiSequenciaVencedora()) {
+				var profundiadeMaxima = 42;
 				var vencedorDesejado = Ligue4Modelo.instancia.jogadores.computador;
-				var computadorVenceu = this.tabuleiro.fornecerSequenciasVencedoras().primeiro().primeiro().ocupanteIgual(vencedorDesejado);
-				return (computadorVenceu) ? 1 : -1 ;
+				var computadorVenceu = this.tabuleiro.fornecerSequenciasVencedoras().primeiro.primeiro.ocupanteIgual(vencedorDesejado);
+				return ((profundiadeMaxima - this.profundidade) * ((computadorVenceu) ? 1 : -1));
 			} else {
 				return 0;
 			}
@@ -156,12 +167,14 @@
 		}
 	});
 
-	NodoDeHeuristica = new Prototipo({
+	var NodoComHeuristica = Classe.criar({
+		estende: Nodo,
+
 		calcularPontuacao: function () {
 			return (this.calcularCondicaoDeVitoria() + this.calcularHeuristica);
 		},
 
-		calcularHeuristica: function (valorInicial) {
+		calcularHeuristica: function () {
 			var jogadasPossiveis = this.tabuleiro.fornecerJogadasPossiveis();
 			var heuristica = jogadasPossiveis.reduzir(function (valorDaHeuristica, celula) {
 				var sequenciasPossiveisDeVitoria = celula.fornecerSequenciasPossiveisDeVitoria(this.jogador);
@@ -173,10 +186,13 @@
 				}, 0);
 				return (valorDaHeuristica + heuristicaDasSequencias);
 			}, 0);
+			return heuristica;
 		}
 	});
 
+	global.EstrategiaNodo = EstrategiaNodo;
 	global.Ligue4Ia = Ligue4Ia;
-	global.EstrategiaMinimax = EstrategiaMinimax;
 	global.Minimax = Minimax;
+	global.Nodo = Nodo;
+	global.NodoComHeuristica = NodoComHeuristica;
 }(this));

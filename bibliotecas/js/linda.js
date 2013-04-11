@@ -216,14 +216,9 @@
 	};
 
 	Function.implementar({
-		aplicarComEscopo: function (escopo, argumentos) {
-			return this.apply(escopo, argumentos);
-		},
+		aplicarComEscopo: Function.prototype.apply,
 
-		chamarComEscopo: function (escopo) {
-			arguments.removerPosicao(0);
-			return this.aplicarComEscopo(escopo, arguments);
-		},
+		chamarComEscopo: Function.prototype.call,
 
 		estender: function (implementacoes) {
 			for (var implementacao in implementacoes) {
@@ -341,6 +336,8 @@
 		}
 	});
 }(this));
+/*global Linda*/
+
 (function () {
 	"use strict";
 
@@ -387,14 +384,6 @@
 			for (var indice = 0; indice < this.length; indice++) {
 				funcaoDeIteracao(this[indice], indice);
 			}
-		},
-
-		primeiro: function () {
-			return this[0];
-		},
-
-		primeiroIndice: function () {
-			return 0;
 		},
 
 		quantidadeMenorQue: function (quantidade) {
@@ -452,16 +441,34 @@
 			this.removerPosicao(this.fornecerIndice(elemento));
 		},
 
-		ultimo: function () {
-			return this[this.length - 1];
-		},
-
-		ultimoIndice: function () {
-			return (this.length - 1);
-		},
-
 		vazio: function () {
 			return (this.length === 0);
+		}
+	});
+
+	Array.prototype.definirPropriedades({
+		primeiro: {
+			funcaoFornecer: function () {
+				return this[0];
+			}
+		},
+
+		primeiroIndice: {
+			funcaoFornecer: function () {
+				return 0;
+			}
+		},
+
+		ultimo: {
+			funcaoFornecer: function () {
+				return this[this.length - 1];
+			}
+		},
+
+		ultimoIndice: {
+			funcaoFornecer: function () {
+				return (this.length - 1);
+			}
 		}
 	});
 } ());
@@ -560,51 +567,86 @@
 (function (global) {
 	"use strict";
 
-	var Prototipo = function Prototipo(corpoDoPrototipo) {
-		var Estende = corpoDoPrototipo.Estende;
-		var estende = Linda.instanciaDe(Estende, Function);
-		var NovoPrototipo = function Objeto() {
-			if (Linda.instanciaDe(this.inicializar, Function)) {
-				this.inicializar.aplicarComEscopo(this, arguments);
-			}
-		};
-		if (estende) {
-			NovoPrototipo.prototype = new Estende();
+	var Objeto = function Objeto() {};
+
+	Objeto.implementar({
+		igual: function (outro) {
+			return (this === outro);
 		}
-		delete corpoDoPrototipo.Estende;
-		NovoPrototipo.implementar(corpoDoPrototipo);
-		return NovoPrototipo;
-	};
+	});
 
-	var PrototipoUnico = function PrototipoUnico(corpoDoPrototipo) {
-		var novoPrototipoUnico = {
-			instanciaUnica: null,
+	var Classe = function Classe() {};
 
-			instancia: function () {
-				var NovoPrototipo = new Prototipo(corpoDoPrototipo);
-				this.instanciaUnica = new NovoPrototipo();
-				this.instanciaUnica.inicializarUnico.aplicarComEscopo(this.instanciaUnica, arguments);
-				novoPrototipoUnico.definirPropriedade("instanciaUnica", Linda.propriedadesDeAtributos);
-				novoPrototipoUnico.definirPropriedade("instancia", {
-					configuravel: false,
-					enumeravel: false,
-					funcaoFornecer: function () {
-						return this.instanciaUnica;
-					}
-				});
-				return this.instanciaUnica;
+	Classe.estender({
+		criar: function (corpoDaClasse) {
+			var SuperClasse = corpoDaClasse.estende;
+			var estende = Linda.instanciaDe(SuperClasse, Function);
+			var inicializa = Linda.instanciaDe(corpoDaClasse.inicializar, Function);
+			var NovaClasse = function Objeto() { this.inicializar.aplicarComEscopo(this, arguments); };
+			var prototipo = Objeto.prototype;
+			if (estende) {
+				prototipo = SuperClasse.prototype;
+				delete corpoDaClasse.estende;
 			}
-		};
-		return novoPrototipoUnico;
-	};
+			NovaClasse.prototype = Object.create(prototipo);
+			NovaClasse.prototipo = NovaClasse.prototype;
+			corpoDaClasse.inicializar = (inicializa) ? corpoDaClasse.inicializar : function () {};
+			NovaClasse.implementar(corpoDaClasse);
+			return NovaClasse;
+		},
 
-	var EnumeracaoDePrototipos = new Prototipo({
-		inicializar: function (enumeracoes, corpoDoPrototipo) {
-			var PrototipoDaEnumeracao = new Prototipo(corpoDoPrototipo);
+		criarSingleton: function(corpoDaClasse) {
+			var NovaClasseUnica = Classe.criar(corpoDaClasse);
+			NovaClasseUnica.estender({
+				instanciaUnica: null,
+				instancia: function () {
+					this.instanciaUnica = Object.create(this.prototipo);
+					this.aplicarComEscopo(this.instanciaUnica, arguments);
+					this.definirPropriedades({
+						instanciaUnica: Linda.propriedadesDeAtributos,
+						instancia: {
+							configuravel: false,
+							enumeravel: false,
+							funcaoFornecer: function () {
+								return this.instanciaUnica;
+							}
+						}
+					});
+					return this.instanciaUnica;
+				}
+			});
+			return NovaClasseUnica;
+		},
+
+		criarEnumeracao: function (enumeracoes, corpoDaClasse) {
+			var ClasseEnumeracao = Classe.criar(corpoDaClasse);
+			var NovaEnumeracao = new Enumeracao(ClasseEnumeracao);
 			enumeracoes.paraCada(function (argumentos, enumeracao) {
-				this[enumeracao] = new PrototipoDaEnumeracao();
-				this[enumeracao].inicializarEnumeracao.aplicarComEscopo(this[enumeracao], argumentos);
-			}, this);
+				this[enumeracao] = Object.create(ClasseEnumeracao.prototipo);
+				ClasseEnumeracao.aplicarComEscopo(this[enumeracao], argumentos);
+			}, NovaEnumeracao);
+			return NovaEnumeracao;
+		},
+
+		criarEnumeracaoDeConstantes: function (enumeracoes) {
+			var NovaEnumeracaoDeConstantes = new Enumeracao();
+			enumeracoes.paraCada(function (valor, enumeracao) {
+				this[enumeracao] = valor;
+			}, NovaEnumeracaoDeConstantes);
+			return NovaEnumeracaoDeConstantes;
+		}
+	});
+
+	var Enumeracao = Classe.criar({
+		inicializar: function (classe) {
+			this.definirPropriedades({
+				classe: {
+					gravavel: false,
+					enumeravel: false,
+					configuravel: false,
+					valor: classe
+				}
+			});
 		},
 
 		mapear: function (chave) {
@@ -629,48 +671,19 @@
 		}
 	});
 
-	var EnumeracaoDeConstantes = new Prototipo({
-		inicializar: function (enumeracoes) {
-			enumeracoes.paraCada(function (valor, enumeracao) {
-				this[enumeracao] = valor;
-			}, this);
-		},
-
-		mapear: function (chave) {
-			var enumeracaoEncontrada = null;
-			this.paraCada(function (enumeracao) {
-				if (enumeracao === chave) {
-					enumeracaoEncontrada = enumeracao;
-					return;
-				}
-			}, this);
-			return enumeracaoEncontrada;
-		},
-
-		comoLista: function () {
-			var lista = [];
-			this.paraCada(function (enumeracao) {
-				lista.push(enumeracao);
-			}, this);
-			return lista;
-		}
-	});
-
-	global.Prototipo = Prototipo;
-	global.PrototipoUnico = PrototipoUnico;
-	global.EnumeracaoDePrototipos = EnumeracaoDePrototipos;
-	global.EnumeracaoDeConstantes = EnumeracaoDeConstantes;
+	global.Classe = Classe;
+	global.Objeto = Objeto;
+	global.Enumeracao = Enumeracao;
 }(this));
 /*global Linda*/
-/*global EnumeracaoDeConstantes*/
-/*global EnumeracaoDePrototipos*/
+/*global Classe*/
 
 (function (global) {
 	"use strict";
 
-	var Tipo = new EnumeracaoDeConstantes(Linda.tipos);
+	var Tipo = Classe.criarEnumeracaoDeConstantes(Linda.tipos);
 
-	var Evento = new EnumeracaoDeConstantes({
+	var Evento = Classe.criarEnumeracaoDeConstantes({
 		TECLA_PRESSIONADA: "keydown",
 		TECLA_SOLTA: "keyup",
 		CARREGADO: "load",
@@ -678,14 +691,14 @@
 		DUPLO_CLIQUE: "dbclick"
 	});
 
-	var Tecla = new EnumeracaoDeConstantes({
+	var Tecla = Classe.criarEnumeracaoDeConstantes({
 		CIMA: 38,
 		BAIXO: 40,
 		ESQUERDA: 37,
 		DIREITA: 39
 	});
 
-	var AtributoHttp = new EnumeracaoDeConstantes({
+	var AtributoHttp = Classe.criarEnumeracaoDeConstantes({
 		CONTENT_TYPE: "Content-Type",
 		ACCEPT: "Accept",
 		ACCEPT_CHARSET: "Accept-Charset",
@@ -711,7 +724,7 @@
 		VIA: "Via"
 	});
 
-	var MetodoHttp = new EnumeracaoDeConstantes({
+	var MetodoHttp = Classe.criarEnumeracaoDeConstantes({
 		GET: "GET",
 		PUT: "PUT",
 		POST: "POST",
@@ -720,7 +733,7 @@
 		OPTIONS: "OPTIONS"
 	});
 
-	var TipoDeResposta = new EnumeracaoDeConstantes({
+	var TipoDeResposta = Classe.criarEnumeracaoDeConstantes({
 		JSON: "",
 		TEXTO: "text",
 		DOCUMENTO: "document",
@@ -728,7 +741,14 @@
 		ARRAY_BUFFER: "arraybuffer"
 	});
 
-	var TipoGenericoDeMidia = new EnumeracaoDePrototipos({
+	var TipoDeObservacao = Classe.criarEnumeracaoDeConstantes({
+		ATUALIZACAO: "updated",
+		RECONFIGURACAO: "reconfigured",
+		REMOCAO: "deleted",
+		CRIACAO: "new"
+	});
+
+	var TipoGenericoDeMidia = Classe.criarEnumeracao({
 		APLICACAO: ["application"],
 		AUDIO: ["audio"],
 		IMAGEM: ["image"],
@@ -738,7 +758,7 @@
 		TEXTO: ["text"],
 		VIDEO: ["video"]
 	}, {
-		inicializarEnumeracao: function (chave) {
+		inicializar: function (chave) {
 			this.chave = chave;
 		},
 
@@ -751,7 +771,7 @@
 		}
 	});
 
-	var TipoDeMidia = new EnumeracaoDePrototipos({
+	var TipoDeMidia = Classe.criarEnumeracao({
 		JS: [TipoGenericoDeMidia.APLICACAO, "javascript"],
 		JSON: [TipoGenericoDeMidia.APLICACAO, "json"],
 		PDF: [TipoGenericoDeMidia.APLICACAO, "pdf"],
@@ -773,7 +793,7 @@
 		VORBIS: [TipoGenericoDeMidia.VIDEO, "vorbis"],
 		WEBM: [TipoGenericoDeMidia.VIDEO, "webm"]
 	}, {
-		inicializarEnumeracao: function (tipoGenerico, tipo) {
+		inicializar: function (tipoGenerico, tipo) {
 			this.tipoGenerico = tipoGenerico;
 			this.tipo = tipo;
 			this.chave = String.formatar("%@/%@", this.tipoGenerico.comoTexto(), this.tipo);
@@ -788,7 +808,7 @@
 		}
 	});
 
-	var CodigoHttp = new EnumeracaoDePrototipos({
+	var CodigoHttp = Classe.criarEnumeracao({
 		HTTP_100: [100, "Continuar", "Continue"],
 		HTTP_101: [101, "Trocando protocolos", "Switching Protocols"],
 		HTTP_200: [200, "Certo", "OK"],
@@ -831,7 +851,7 @@
 		HTTP_504: [504, "Estouro de tempo do portão de acesso", "Gateway Time-out"],
 		HTTP_505: [505, "Versão do protocolo não suportada", "HTTP Version not supported"]
 	}, {
-		inicializarEnumeracao: function (chave, texto, textoIngles) {
+		inicializar: function (chave, texto, textoIngles) {
 			this.chave = chave;
 			this.texto = texto;
 			this.textoIngles = textoIngles;
@@ -870,13 +890,6 @@
 		}
 	});
 
-	var TipoDeObservacao = new EnumeracaoDeConstantes({
-		ATUALIZACAO: "updated",
-		RECONFIGURACAO: "reconfigured",
-		REMOCAO: "deleted",
-		CRIACAO: "new"
-	});
-
 	global.Tipo = Tipo;
 	global.Evento = Evento;
 	global.Tecla = Tecla;
@@ -888,18 +901,18 @@
 	global.TipoGenericoDeMidia = TipoGenericoDeMidia;
 	global.TipoDeObservacao = TipoDeObservacao;
 }(this));
+/*global Classe*/
 /*global CodigoHttp*/
 /*global Evento*/
 /*global Linda*/
 /*global MetodoHttp*/
-/*global Prototipo*/
 /*global TipoDeResposta*/
 
 (function (global) {
 	"use strict";
 
-	var RequisicaoHttp = new Prototipo({
-		inicializarSuper: function (uri, tipoDeResposta) {
+	var RequisicaoHttp = Classe.criar({
+		inicializar: function (uri, tipoDeResposta) {
 			this.requisicaoXml = new XMLHttpRequest();
 			this.requisicaoXml.responseType = tipoDeResposta;
 			this.uri = uri;
@@ -1024,11 +1037,11 @@
 		}
 	});
 
-	var RequisicaoJson = new Prototipo({
-		Estende: RequisicaoHttp,
+	var RequisicaoJson = Classe.criar({
+		estende: RequisicaoHttp,
 
 		inicializar: function (uri) {
-			this.inicializarSuper(uri, TipoDeResposta.JSON);
+			RequisicaoHttp.prototipo.inicializar.chamarComEscopo(this, uri, TipoDeResposta.JSON);
 		},
 
 		fornecerResposta: function () {
@@ -1036,41 +1049,48 @@
 		}
 	});
 
-	var RequisicaoDocumento = new Prototipo({
-		Estende: RequisicaoHttp,
+	var RequisicaoDocumento = Classe.criar({
+		estende: RequisicaoHttp,
 
 		inicializar: function (uri) {
-			this.inicializarSuper(uri, TipoDeResposta.DOCUMENTO);
+			RequisicaoHttp.prototipo.inicializar.chamarComEscopo(this, uri, TipoDeResposta.DOCUMENTO);
 		}
 	});
 
-	var RequisicaoTexto = new Prototipo({
-		Estende: RequisicaoHttp,
+	var RequisicaoTexto = Classe.criar({
+		estende: RequisicaoHttp,
 
 		inicializar: function (uri) {
-			this.inicializarSuper(uri, TipoDeResposta.TEXTO);
+			RequisicaoHttp.prototipo.inicializar.chamarComEscopo(this, uri, TipoDeResposta.TEXTO);
 		}
 	});
 
-	var Tratador = new Prototipo({
-		inicializarSuper: function (elemento) {
+	var Tratador = Classe.criar({
+		inicializar: function (elemento) {
 			this.elemento = (Linda.nuloOuIndefinido(elemento)) ? Linda.janela : elemento;
+			this.tratadores = [];
 		},
 
 		adicionar: function (evento, tratador) {
+			var eventoTratador = {};
+			eventoTratador.evento = evento;
+			eventoTratador.tratador = tratador;
+			this.tratadores.push(eventoTratador);
 			this.elemento.addEventListener(evento, tratador);
 		},
 
-		remover: function (evento) {
-			this.elemento.removeEventListener(evento);
+		remover: function () {
+			this.tratadores.paraCada(function (eventoTratador) {
+				this.elemento.removeEventListener(eventoTratador.evento, eventoTratador.tratador);
+			});
 		}
 	});
 
-	var TratadorDeTeclado = new Prototipo({
-		Estende: Tratador,
+	var TratadorDeTeclado = Classe.criar({
+		estende: Tratador,
 
 		inicializar: function (tecla, elemento) {
-			this.inicializarSuper(elemento);
+			Tratador.prototipo.inicializar.chamarComEscopo(this, elemento);
 			this.tecla = tecla;
 		},
 
@@ -1093,11 +1113,11 @@
 		}
 	});
 
-	var TratadorDeMouse = new Prototipo({
-		Estende: Tratador,
+	var TratadorDeMouse = Classe.criar({
+		estende: Tratador,
 
 		inicializar: function (elemento) {
-			this.inicializarSuper(elemento);
+			Tratador.prototipo.inicializar.chamarComEscopo(this, elemento);
 		},
 
 		paraClique: function (tratador) {
@@ -1106,11 +1126,11 @@
 		}
 	});
 
-	var TratadorDePagina = new Prototipo({
-		Estende: Tratador,
+	var TratadorDePagina = Classe.criar({
+		estende: Tratador,
 
 		inicializar: function (elemento) {
-			this.inicializarSuper(elemento);
+			Tratador.prototipo.inicializar.chamarComEscopo(this, elemento);
 		},
 
 		paraCarregamento: function (tratador) {
@@ -1127,6 +1147,8 @@
 	global.TratadorDePagina = TratadorDePagina;
 }(this));
 /*global HTMLCollection*/
+/*global HTMLTemplateElement*/
+/*global Linda*/
 /*global NodeList*/
 /*global TratadorDeMouse*/
 /*global TratadorDePagina*/
@@ -1143,7 +1165,7 @@
 		limpar: function () {
 			var nodosFilhos = this.children;
 			for (var indice = 0; indice < nodosFilhos.length; indice++) {
-				var nodoFilho = nodosFilhos[indice]
+				var nodoFilho = nodosFilhos[indice];
 				if (!Linda.instanciaDe(nodoFilho, HTMLTemplateElement)) {
 					this.removeChild(nodoFilho);
 					indice--;
@@ -1184,85 +1206,3 @@
 		paraCada: Array.prototype.paraCada
 	});
 }(this));
-/*global Linda*/
-
-(function () {
-	"use strict";
-
-	Linda.definirPropriedades({
-		privadoInstanciaDeTipoPrimitivo: Linda.propriedadesDeAtributos,
-		privadoInstanciaDeDiretaOuIndireta: Linda.propriedadesDeAtributos,
-		privadoHabilitarTelaCheia: Linda.propriedadesDeAtributos,
-		privadoHabilitarTelaCheiaChrome: Linda.propriedadesDeAtributos,
-		privadoHabilitarTelaCheiaFirefox: Linda.propriedadesDeAtributos,
-		privadoDesabilitarTelaCheia: Linda.propriedadesDeAtributos,
-		privadoDesabilitarTelaCheiaChrome: Linda.propriedadesDeAtributos,
-		privadoDesabilitarTelaCheiaFirefox: Linda.propriedadesDeAtributos
-	});
-
-	Object.prototype.definirPropriedades({
-		definirPropriedade: Linda.propriedadesDeAtributos,
-		definirPropriedades: Linda.propriedadesDeAtributos,
-		privadoDefinirPropriedade: Linda.propriedadesDeAtributos,
-		fornecerPropriedades: Linda.propriedadesDeAtributos,
-		fornecerPropriedadesEnumeraveis: Linda.propriedadesDeAtributos,
-		fundir: Linda.propriedadesDeAtributos,
-		observar: Linda.propriedadesDeAtributos,
-		observarAtualizacao: Linda.propriedadesDeAtributos,
-		observarCriacao: Linda.propriedadesDeAtributos,
-		observarReconfiguracao: Linda.propriedadesDeAtributos,
-		observarRemocao: Linda.propriedadesDeAtributos,
-		desobservar: Linda.propriedadesDeAtributos,
-		paraCada: Linda.propriedadesDeAtributosGravaveis,
-		possuiPropriedade: Linda.propriedadesDeAtributos,
-		possuiPropriedadePropria: Linda.propriedadesDeAtributos,
-		prototipoDe: Linda.propriedadesDeAtributos
-	});
-
-	Function.prototype.definirPropriedades({
-		aplicarComEscopo: Linda.propriedadesDeAtributos,
-		chamarComEscopo: Linda.propriedadesDeAtributos,
-		estender: Linda.propriedadesDeAtributos,
-		implementar: Linda.propriedadesDeAtributos,
-		vincularEscopo: Linda.propriedadesDeAtributos
-	});
-
-	Array.prototype.definirPropriedades({
-		contem: Linda.propriedadesDeAtributos,
-		dentroDosLimites: Linda.propriedadesDeAtributos,
-		embaralhar: Linda.propriedadesDeAtributos,
-		fornecerIndice: Linda.propriedadesDeAtributos,
-		fundir: Linda.propriedadesDeAtributos,
-		paraCada: Linda.propriedadesDeAtributos,
-		primeiro: Linda.propriedadesDeAtributos,
-		primeiroIndice: Linda.propriedadesDeAtributos,
-		quantidadeMenorQue: Linda.propriedadesDeAtributos,
-		quantidadeMenorIgualQue: Linda.propriedadesDeAtributos,
-		quantidadeMaiorQue: Linda.propriedadesDeAtributos,
-		quantidadeMaiorIgualQue: Linda.propriedadesDeAtributos,
-		quantidadeIgual: Linda.propriedadesDeAtributos,
-		reduzir: Linda.propriedadesDeAtributos,
-		removerPosicao: Linda.propriedadesDeAtributos,
-		removerElemento: Linda.propriedadesDeAtributos,
-		ultimo: Linda.propriedadesDeAtributos,
-		ultimoIndice: Linda.propriedadesDeAtributos,
-		vazio: Linda.propriedadesDeAtributos
-	});
-
-	String.prototype.definirPropriedades({
-		paraInteiro: Linda.propriedadesDeAtributos,
-		paraFlutuante: Linda.propriedadesDeAtributos
-	});
-
-	String.definirPropriedades({
-		concatenar: Linda.propriedadesDeAtributos,
-		concatenarComEspaco: Linda.propriedadesDeAtributos,
-		formatar: Linda.propriedadesDeAtributos
-	});
-
-	Number.definirPropriedades({
-		naoNumero: Linda.propriedadesDeAtributos,
-		sortear: Linda.propriedadesDeAtributos,
-		sortearInteiro: Linda.propriedadesDeAtributos
-	});
-}());

@@ -1,6 +1,16 @@
-(function () {
-	Ligue4 = new PrototipoUnico({
-		inicializarUnico: function () {
+/*global Classe*/
+/*global Ligue4Controle*/
+/*global Ligue4Ia*/
+/*global Ligue4Modelo*/
+/*global Ligue4Visao*/
+/*global Linda*/
+/*global TratadorDePagina*/
+
+(function (global) {
+	"use strict";
+
+	var Ligue4 = Classe.criarSingleton({
+		inicializar: function () {
 			new TratadorDePagina().paraCarregamento(this.inicializarModulos.vincularEscopo(this));
 		},
 
@@ -20,7 +30,7 @@
 			Ligue4Visao.instancia.atualizarJogadorDaVez(ordemDeJogadores);
 			Linda.janela.setTimeout(function () {
 				Ligue4Ia.instancia.receberJogada(ordemDeJogadores);
-			}, 0);
+			}, 10);
 		},
 
 		declararVencedor: function (sequenciasVencedoras) {
@@ -31,7 +41,6 @@
 		declararEmpate: function () {
 			Ligue4Visao.instancia.declararEmpate();
 			Ligue4Controle.instancia.removerTratadores();
-			
 		},
 
 		declararColunaCheia: function () {
@@ -39,4 +48,6 @@
 		}
 	});
 	Ligue4.instancia();
-}());
+
+	global.Ligue4 = Ligue4;
+}(this));

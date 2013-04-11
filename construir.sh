@@ -18,6 +18,7 @@ binariosHtml=${binarios}/html
 binariosJs=${binarios}/js
 fontesHtml=${fontes}/html
 fontesJs=${fontes}/js
+testesHtml=${testes}/html
 
 limpar() {
 	echo ":limpar";
@@ -35,12 +36,16 @@ criarEstrutura() {
 	mkdir -p ${construcao};
 	mkdir -p ${fontesHtml};
 	mkdir -p ${fontesJs};
+	mkdir -p ${testesHtml};
 }
 
 adicionarBibliotecas() {
 	echo ":adicionarBibliotecas";
-	cp -rf ~/projetos/estilos/construcao/limpo.css -t ${bibliotecasCss};
-	cp -rf ~/projetos/lindaJs/construcao/linda.js -t ${bibliotecasJs};
+	cp -rf ../estilos/construcao/limpo.css ${bibliotecasCss};
+	cp -rf ../verificaJs/construcao/verifica.css ${bibliotecasCss};
+	cp -rf ../verificaJs/construcao/verifica.js ${bibliotecasJs};
+	cp -rf ../verificaJs/construcao/jsHint.js ${bibliotecasJs};
+	cp -rf ../lindaJs/construcao/linda.js ${bibliotecasJs};
 }
 
 compilar() {
@@ -49,7 +54,7 @@ compilar() {
 	adicionarBibliotecas;
 	echo ":compilar";
 	cp -rf ${bibliotecasCss}/* ${binariosCss};
-	cp -rf ${fontesHtml}/* ${binariosHtml};
+	cp -rf ${fontesHtml}/* ${testesHtml}/* ${binariosHtml};
 	cp -rf ${bibliotecasJs}/* ${fontesJs}/* ${binariosJs};
 }
 
@@ -61,6 +66,7 @@ construir() {
 testar() {
 	construir;
 	echo ":testar";
+	chromium-browser `find ${binariosHtml} -name teste*.html` --allow-file-access-from-files;
 }
 
 depurar() {

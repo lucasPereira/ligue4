@@ -1,6 +1,18 @@
+/*global Classe*/
+/*global EstrategiaNodo*/
+/*global Ligue4Ia*/
+/*global Ligue4Modelo*/
+/*global Ligue4Visao*/
+/*global Linda*/
+/*global Nodo*/
+/*global NodoComHeuristica*/
+/*global NodoComHeuristicaComPoda*/
+
 (function (global) {
-	Ligue4Controle = new PrototipoUnico({
-		inicializarUnico: function () {
+	"use strict";
+
+	var Ligue4Controle = Classe.criarSingleton({
+		inicializar: function () {
 			this.adicionarTratadores();
 		},
 
@@ -14,12 +26,8 @@
 			Linda.selecionar("section.configuracoes button.iniciarIa").tratadorDeClique(this.iniciarIa.vincularEscopo(this));
 		},
 
-		adicionarTratadorDeMensagem: function (mesagem) {
+		adicionarTratadorDeMensagem: function () {
 			Linda.selecionar("section.mensagem > p.mensagem").tratadorDeClique(this.fecharMensagem.vincularEscopo(this));
-		},
-
-		removerTratadores: function () {
-			//TODO
 		},
 
 		iniciarIa: function () {
@@ -39,11 +47,11 @@
 			}
 			estrategiaEscolhida = estrategiaEscolhida.value;
 			if (estrategiaEscolhida === "minimax") {
-				EstrategiaMinimax.fixarEstrategia(Minimax);
+				EstrategiaNodo.fixarEstrategia(Nodo);
 			} else if (estrategiaEscolhida === "minimaxComHeuristica") {
-				EstrategiaMinimax.fixarEstrategia(MinimaxComHeuristica);
+				EstrategiaNodo.fixarEstrategia(NodoComHeuristica);
 			} else if (estrategiaEscolhida === "minimaxComHeuristicaComPoda") {
-				EstrategiaMinimax.fixarEstrategia(MinimaxComHeuristicaComPoda);
+				EstrategiaNodo.fixarEstrategia(NodoComHeuristicaComPoda);
 			}
 			Ligue4Ia.instancia.profundidade = profundidade;
 			Ligue4Ia.instancia.construirArvore = construirArvore;

@@ -1,6 +1,14 @@
+/*global Classe*/
+/*global Ligue4Controle*/
+/*global Ligue4Modelo*/
+/*global Linda*/
+/*global Minimax*/
+
 (function (global) {
-	Ligue4Visao = new PrototipoUnico({
-		inicializarUnico: function () {
+	"use strict";
+
+	var Ligue4Visao = Classe.criarSingleton({
+		inicializar: function () {
 			this.construirTabuleiro();
 			// this.observarTabuleiro();
 			// this.observarJogadores();
@@ -38,19 +46,7 @@
 			var celulaCelulaDoTabuleiro = templateCelulaDoTabuleiro.selecionar("td.celulaDoTabuleiro");
 			while (nodos.length > 0) {
 				var nodoAtual = nodos.shift();
-				nodoAtual.tabuleiro.celulas.paraCada(function (linha) {
-					linha.paraCada(function (celula) {
-						if (celula.ocupada()) {
-							celulaCelulaDoTabuleiro.classList.add(celula.ocupante.identificador);
-						}
-						linhaLinhaDoTabuleiro.appendChild(templateCelulaDoTabuleiro.cloneNode(true));
-						if (celula.ocupada()) {
-							celulaCelulaDoTabuleiro.classList.remove(celula.ocupante.identificador);
-						}
-					});
-					tabelaTabuleiro.appendChild(templateLinhaDoTabuleiro.cloneNode(true));
-					linhaLinhaDoTabuleiro.limpar();
-				});
+				this.construirTabuleiroDaArvoreMinimax(nodoAtual, celulaCelulaDoTabuleiro, linhaLinhaDoTabuleiro, tabelaTabuleiro, templateCelulaDoTabuleiro, templateLinhaDoTabuleiro);
 				alfaBeta.textContent = String.formatar("%@/%@", nodoAtual.alfa, nodoAtual.beta);
 				jogador.textContent = nodoAtual.jogador.nome;
 				secaoArvore.appendChild(templateNodo.cloneNode(true));
@@ -58,6 +54,22 @@
 				nodos.fundir(nodoAtual.filhos);
 				tabelaTabuleiro.limpar();
 			}
+		},
+
+		construirTabuleiroDaArvoreMinimax: function (nodoAtual, celulaCelulaDoTabuleiro, linhaLinhaDoTabuleiro, tabelaTabuleiro, templateCelulaDoTabuleiro, templateLinhaDoTabuleiro) {
+			nodoAtual.tabuleiro.celulas.paraCada(function (linha) {
+				linha.paraCada(function (celula) {
+					if (celula.ocupada()) {
+						celulaCelulaDoTabuleiro.classList.add(celula.ocupante.identificador);
+					}
+					linhaLinhaDoTabuleiro.appendChild(templateCelulaDoTabuleiro.cloneNode(true));
+					if (celula.ocupada()) {
+						celulaCelulaDoTabuleiro.classList.remove(celula.ocupante.identificador);
+					}
+				});
+				tabelaTabuleiro.appendChild(templateLinhaDoTabuleiro.cloneNode(true));
+				linhaLinhaDoTabuleiro.limpar();
+			});
 		},
 
 		observarJogadores: function () {
@@ -80,7 +92,7 @@
 		},
 
 		observarNodos: function () {
-			EstrategiaMinimax.observarAtualizacao(this.atualizarNodos.vincularEscopo(this));
+			Minimax.observarAtualizacao(this.atualizarNodos.vincularEscopo(this));
 		},
 
 		atualizarNodos: function (minimax, propriedade) {
@@ -94,7 +106,7 @@
 		},
 
 		atualizarJogadorDaVez: function (ordemDeJogadores) {
-			var jogadorDaVez = ordemDeJogadores.primeiro();
+			var jogadorDaVez = ordemDeJogadores.primeiro;
 			var itensJogadores = Linda.selecionarTodos("ul.jogadores > li");
 			for (var indice = 0, tamanho = itensJogadores.length; indice < tamanho; indice++) {
 				itensJogadores[indice].classList.remove("jogadorDaVez");
@@ -103,7 +115,7 @@
 		},
 
 		declararVencedor: function (sequenciasVencedoras) {
-			this.mostrarMensagem(String.formatar("O jogador %@ venceu.", sequenciasVencedoras.primeiro().primeiro().ocupante.nome));
+			this.mostrarMensagem(String.formatar("O jogador %@ venceu.", sequenciasVencedoras.primeiro.primeiro.ocupante.nome));
 		},
 
 		declararEmpate: function () {
@@ -115,7 +127,7 @@
 		},
 
 		limparMensagem: function (secaoMensagem) {
-			var secaoMensagem = secaoMensagem || Linda.selecionar("section.mensagem");
+			secaoMensagem = secaoMensagem || Linda.selecionar("section.mensagem");
 			var mensagens = secaoMensagem.selecionarTodos("p.mensagem");
 			mensagens.paraCada(function (mensagem) {
 				mensagem.remove();

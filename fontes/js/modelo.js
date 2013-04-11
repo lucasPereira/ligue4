@@ -1,19 +1,25 @@
+/*global Classe*/
+/*global Ligue4*/
+/*global Linda*/
+
 (function (global) {
-	Ligue4Modelo = new PrototipoUnico({
-		inicializarUnico: function () {
+	"use strict";
+
+	var Ligue4Modelo = Classe.criarSingleton({
+		inicializar: function () {
 			this.quantidadeDeLinhas = 6;
 			this.quantidadeDeColunas = 7;
 			this.jogadores = {
 				humano: new Jogador("Humano", "humano"),
 				computador: new Jogador("Computador", "computador")
 			};
-			this.tabuleiro = new Tabuleiro(this.quantidadeDeLinhas, this.quantidadeDeColunas);;
+			this.tabuleiro = new Tabuleiro(this.quantidadeDeLinhas, this.quantidadeDeColunas);
 			this.ordemDeJogadores = [this.jogadores.humano, this.jogadores.computador];
 			this.ordemDeJogadores.embaralhar();
 		},
 
 		jogar: function (coluna) {
-			var jogadorDaVez = this.ordemDeJogadores.primeiro();
+			var jogadorDaVez = this.ordemDeJogadores.primeiro;
 			var jogadaRealizada = this.tabuleiro.receberJogada(coluna, jogadorDaVez);
 			if (jogadaRealizada) {
 				if (this.tabuleiro.possuiSequenciaVencedora()) {
@@ -47,11 +53,11 @@
 		},
 
 		humanoPodeJogar: function () {
-			return (this.ordemDeJogadores.primeiro().igual(this.jogadores.humano) && this.podeJogar());
+			return (this.ordemDeJogadores.primeiro.igual(this.jogadores.humano) && this.podeJogar());
 		},
 
 		computadorPodeJogar: function () {
-			return (this.ordemDeJogadores.primeiro().igual(this.jogadores.computador) && this.podeJogar());
+			return (this.ordemDeJogadores.primeiro.igual(this.jogadores.computador) && this.podeJogar());
 		},
 
 		podeJogar: function () {
@@ -59,7 +65,7 @@
 		}
 	});
 
-	Tabuleiro = new Prototipo({
+	var Tabuleiro = Classe.criar({
 		inicializar: function (quantidadeDeLinhas, quantidadeDeColunas, clonagem) {
 			this.sequenciasVencedoras = [];
 			this.celulas = new Array(this.quantidadeDeLinhas);
@@ -86,13 +92,13 @@
 				clone.celulas[indiceDaLinha] = new Array(this.quantidadeDeColunas);
 				linha.paraCada(function (celula, indiceDaColuna) {
 					clone.celulas[indiceDaLinha][indiceDaColuna] = celula.clonar(clone);
-				});
-			});
+				}, this);
+			}, this);
 		},
 
 		clonarSequenciasVencedoras: function (clone) {
 			this.sequenciasVencedoras.paraCada(function (sequencia) {
-				var novaSequencia = []
+				var novaSequencia = [];
 				sequencia.paraCada(function (celula) {
 					novaSequencia.push(clone.celulas[celula.linha][celula.coluna]);
 				});
@@ -110,7 +116,6 @@
 		},
 
 		receberJogada: function (indiceDaColuna, jogador) {
-			var indiceDaLinha = this.celulas.ultimoIndice();
 			var celulaAtual = this.fornecerPrimeiraCelulaLivreNaColuna(indiceDaColuna);
 			var jogadaPossivel = (celulaAtual.livre() && celulaAtual.dentroDoTabuleiro());
 			if (jogadaPossivel) {
@@ -123,11 +128,11 @@
 		},
 
 		fornecerPrimeiraCelulaDeCimaNaColuna: function (coluna) {
-			return this.celulas.primeiro()[coluna];
+			return this.celulas.primeiro[coluna];
 		},
 
 		fornecerPrimeiraCelulaDeBaixoNaColuna: function (coluna) {
-			return this.celulas.ultimo()[coluna];
+			return this.celulas.ultimo[coluna];
 		},
 
 		fornecerPrimeiraCelulaLivreNaColuna: function (indiceDaColuna) {
@@ -179,7 +184,7 @@
 		}
 	});
 
-	Celula = new Prototipo({
+	var Celula = Classe.criar({
 		inicializar: function (linha, coluna, tabuleiro) {
 			this.linha = linha;
 			this.coluna = coluna;
@@ -194,7 +199,7 @@
 		},
 
 		igual: function (outra) {
-			return (this.linha == outra.linha && this.coluna == outra.coluna);
+			return (this.linha === outra.linha && this.coluna === outra.coluna);
 		},
 
 		livre: function () {
@@ -226,7 +231,7 @@
 			var sequencias = [];
 			var sequenciasSelecionadas = [];
 			sequencias.push(this.fornecerAdjacentesTopo(quantidadeDeLigacoes));
-			sequencias.push(this.fornecerAdjacentesFundo(quantidadeDeLigacoes))
+			sequencias.push(this.fornecerAdjacentesFundo(quantidadeDeLigacoes));
 			sequencias.push(this.fornecerAdjacentesEsquerda(quantidadeDeLigacoes));
 			sequencias.push(this.fornecerAdjacentesDireita(quantidadeDeLigacoes));
 			sequencias.push(this.fornecerAdjacentesTopoEsquerda(quantidadeDeLigacoes));
@@ -276,35 +281,35 @@
 		},
 
 		fornecerAdjacenteTopo: function () {
-			return this.fornecerAdjacentes(-1, 0 ,1, true).primeiro();
+			return this.fornecerAdjacentes(-1, 0 ,1, true).primeiro;
 		},
 
 		fornecerAdjacenteFundo: function () {
-			return this.fornecerAdjacentes(1, 0 ,1, true).primeiro();
+			return this.fornecerAdjacentes(1, 0 ,1, true).primeiro;
 		},
 
 		fornecerAdjacenteEsquerda: function () {
-			return this.fornecerAdjacentes(0, -1 ,1, true).primeiro();
+			return this.fornecerAdjacentes(0, -1 ,1, true).primeiro;
 		},
 
 		fornecerAdjacenteDireita: function () {
-			return this.fornecerAdjacentes(0, 1 ,1, true).primeiro();
+			return this.fornecerAdjacentes(0, 1 ,1, true).primeiro;
 		},
 
 		fornecerAdjacenteTopoEsquerda: function () {
-			return this.fornecerAdjacentes(-1, -1 ,1, true).primeiro();
+			return this.fornecerAdjacentes(-1, -1 ,1, true).primeiro;
 		},
 
 		fornecerAdjacenteTopoDireita: function () {
-			return this.fornecerAdjacentes(-1, 1 ,1, true).primeiro();
+			return this.fornecerAdjacentes(-1, 1 ,1, true).primeiro;
 		},
 
 		fornecerAdjacenteFundoEsquerda: function () {
-			return this.fornecerAdjacentes(1, -1 ,1, true).primeiro();
+			return this.fornecerAdjacentes(1, -1 ,1, true).primeiro;
 		},
 
 		fornecerAdjacenteFundoDireita: function () {
-			return this.fornecerAdjacentes(1, 1 ,1, true).primeiro();
+			return this.fornecerAdjacentes(1, 1 ,1, true).primeiro;
 		},
 
 		fornecerAdjacentesTopo: function (quantidade) {
@@ -379,8 +384,8 @@
 		}
 	});
 
-	CelulaForaDoTabuleiro = new Prototipo({
-		Estende: Celula,
+	var CelulaForaDoTabuleiro = Classe.criar({
+		estende: Celula,
 
 		inicializar: function (tabuleiro) {
 			this.tabuleiro = tabuleiro;
@@ -395,7 +400,7 @@
 		}
 	});
 
-	Jogador = new Prototipo({
+	var Jogador = Classe.criar({
 		inicializar: function (nome, identificador) {
 			this.nome = nome;
 			this.identificador = identificador;
