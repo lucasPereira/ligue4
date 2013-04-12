@@ -277,20 +277,23 @@
 		},
 
 		fundir: function (outro) {
-			outro.paraCada(function (propriedade, chave) {
-				this[chave] = propriedade;
-			}, this);
+			for (var chave in outro) {
+				if (outro.possuiPropriedadePropria(chave)) {
+					this[chave] = outro[chave];
+				}
+			}
 		},
 
 		observar: function (tratador, propriedade, tipoDeObservacao) {
 			Object.observe(this, function (observacoes) {
-				observacoes.paraCada(function (observacao) {
+				for (var indice = 0, tamanho = observacoes.length; indice < tamanho; indice++) {
+					var observacao = observacoes[indice];
 					var observacaoDesejada = (observacao.type === tipoDeObservacao || Linda.nuloOuIndefinido(tipoDeObservacao));
 					var propriedadeDesejada = (observacao.name === propriedade || Linda.nuloOuIndefinido(propriedade));
 					if (observacaoDesejada && propriedadeDesejada) {
 						tratador(observacao.object, observacao.name, observacao.type, observacao.oldValue);
 					}
-				});
+				}
 			});
 		},
 
@@ -368,7 +371,7 @@
 		},
 
 		dentroDosLimites: function (indice) {
-			return (!this.vazio() && indice >= 0 && indice < this.length);
+			return (this.length !== 0 && indice >= 0 && indice < this.length);
 		},
 
 		fornecerIndice: function (elemento) {
@@ -381,7 +384,7 @@
 
 		paraCada: function (funcaoDeIteracao, escopo) {
 			funcaoDeIteracao = funcaoDeIteracao.vincularEscopo(escopo);
-			for (var indice = 0; indice < this.length; indice++) {
+			for (var indice = 0, tamanho = this.length; indice < tamanho; indice++) {
 				funcaoDeIteracao(this[indice], indice);
 			}
 		},
@@ -409,7 +412,7 @@
 		reduzir: function (funcaoDeReducao, valorAtual, escopo) {
 			funcaoDeReducao = funcaoDeReducao.vincularEscopo(escopo);
 			valorAtual = valorAtual || 0;
-			for (var indice = 0; indice < this.length; indice++) {
+			for (var indice = 0, tamanho = this.length; indice < tamanho; indice++) {
 				valorAtual = funcaoDeReducao(valorAtual, this[indice], indice);
 			}
 			return valorAtual;
@@ -418,7 +421,7 @@
 		reduzirSemPrimeiro: function (funcaoDeReducao, valorAtual, escopo) {
 			funcaoDeReducao = funcaoDeReducao.vincularEscopo(escopo);
 			valorAtual = valorAtual || 0;
-			for (var indice = 1; indice < this.length; indice++) {
+			for (var indice = 1, tamanho = this.length; indice < tamanho; indice++) {
 				valorAtual = funcaoDeReducao(valorAtual, this[indice], indice);
 			}
 			return valorAtual;
@@ -427,7 +430,7 @@
 		reduzirSemUltimo: function (funcaoDeReducao, valorAtual, escopo) {
 			funcaoDeReducao = funcaoDeReducao.vincularEscopo(escopo);
 			valorAtual = valorAtual || 0;
-			for (var indice = 0; indice < (this.length - 1); indice++) {
+			for (var indice = 0, tamanho = (this.length - 1); indice < tamanho; indice++) {
 				valorAtual = funcaoDeReducao(valorAtual, this[indice], indice);
 			}
 			return valorAtual;
@@ -472,25 +475,23 @@
 		}
 	});
 } ());
-/*global Linda*/
-
 (function () {
 	"use strict";
 
 	String.implementar({
 		paraInteiro: function () {
-			return Linda.global.parseInt(this);
+			return parseInt(this, 10);
 		},
 
 		paraFlutuante: function () {
-			return Linda.global.parseFloat(this);
+			return parseFloat(this, 10);
 		}
 	});
 
 	String.estender({
 		concatenar: function () {
 			var texto = "";
-			for (var indice = 0; indice < arguments.length; indice++) {
+			for (var indice = 0, tamanho = arguments.length; indice < tamanho; indice++) {
 				texto = texto + arguments[indice];
 			}
 			return texto;
@@ -498,14 +499,14 @@
 
 		concatenarComEspaco: function () {
 			var texto = "";
-			for (var indice = 0; indice < arguments.length; indice++) {
+			for (var indice = 0, tamanho = arguments.length; indice < tamanho; indice++) {
 				texto = texto + " " + arguments[indice];
 			}
 			return (arguments.length > 0) ? texto.substr(1, texto.length - 1) : texto;
 		},
 
 		formatar: function (mensagem) {
-			for (var indice = 1; indice < arguments.length; indice++) {
+			for (var indice = 1, tamanho = arguments.length; indice < tamanho; indice++) {
 				mensagem = mensagem.replace(new RegExp("%@"), arguments[indice]);
 				mensagem = mensagem.replace(new RegExp("%" + indice, "g"), arguments[indice]);
 			}

@@ -11,8 +11,6 @@
 			Minimax.fixarVencedorDesejado(Ligue4Modelo.instancia.jogadores.computador);
 			this.construirArvore = false;
 			this.profundidade = 4;
-			//TODO: construirSubArvore: evitar clonagem de ordemDeJogadores.
-			//TODO: verificar efetividade do método clonar do tabuleiro.
 		},
 
 		receberJogada: function (ordemDeJogadores) {
@@ -113,7 +111,7 @@
 		calcularMinimo: function () {
 			Minimax.nodosProcessados++;
 			Minimax.totalDeNodosProcessados++;
-			if (this.filhos.vazio()) {
+			if (this.nodoFolha()) {
 				this.beta = this.calcularPontuacao();
 				return this.beta;
 			}
@@ -129,7 +127,7 @@
 		calcularMaximo: function () {
 			Minimax.nodosProcessados++;
 			Minimax.totalDeNodosProcessados++;
-			if (this.filhos.vazio()) {
+			if (this.nodoFolha()) {
 				this.alfa = this.calcularPontuacao();
 				return this.alfa;
 			}
@@ -143,10 +141,10 @@
 		},
 
 		calcularPontuacao: function () {
-			return this.calcularCondicaoDeVitoria();
+			return this.calcularFuncaoDeUtilidade();
 		},
 
-		calcularCondicaoDeVitoria: function () {
+		calcularFuncaoDeUtilidade: function () {
 			if (this.tabuleiro.possuiSequenciaVencedora()) {
 				var profundiadeMaxima = 42;
 				var computadorVenceu = this.tabuleiro.fornecerSequenciasVencedoras().primeiro.primeiro.ocupanteIgual(Minimax.vencedorDesejado);
@@ -169,8 +167,14 @@
 				}
 			});
 			return proximoPasso;
+		},
+
+		nodoFolha: function () {
+			return this.filhos.vazio();
 		}
 	});
+
+	var NodoComHeuristicaComPoda = Classe.criar({});
 
 	var NodoComHeuristica = Classe.criar({
 		estende: Nodo,
@@ -180,7 +184,7 @@
 		},
 
 		calcularPontuacao: function () {
-			return (this.calcularCondicaoDeVitoria() + this.calcularHeuristica);
+			return (this.calcularFuncaoDeUtilidade() + this.calcularHeuristica);
 		},
 
 		calcularHeuristica: function () {

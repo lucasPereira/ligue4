@@ -10,9 +10,6 @@
 	var Ligue4Visao = Classe.criarSingleton({
 		inicializar: function () {
 			this.construirTabuleiro();
-			// this.observarTabuleiro();
-			// this.observarJogadores();
-			this.observarNodos();
 		},
 
 		construirTabuleiro: function () {
@@ -59,17 +56,21 @@
 		construirTabuleiroDaArvoreMinimax: function (nodoAtual, celulaCelulaDoTabuleiro, linhaLinhaDoTabuleiro, tabelaTabuleiro, templateCelulaDoTabuleiro, templateLinhaDoTabuleiro) {
 			nodoAtual.tabuleiro.celulas.paraCada(function (linha) {
 				linha.paraCada(function (celula) {
-					if (celula.ocupada()) {
-						celulaCelulaDoTabuleiro.classList.add(celula.ocupante.identificador);
-					}
-					linhaLinhaDoTabuleiro.appendChild(templateCelulaDoTabuleiro.cloneNode(true));
-					if (celula.ocupada()) {
-						celulaCelulaDoTabuleiro.classList.remove(celula.ocupante.identificador);
-					}
-				});
+					this.ocuparCelulaDoTabuleiroDaArvoreMinimax(celula, celulaCelulaDoTabuleiro, linhaLinhaDoTabuleiro, templateCelulaDoTabuleiro);
+				}, this);
 				tabelaTabuleiro.appendChild(templateLinhaDoTabuleiro.cloneNode(true));
 				linhaLinhaDoTabuleiro.limpar();
-			});
+			}, this);
+		},
+
+		ocuparCelulaDoTabuleiroDaArvoreMinimax: function (celula, celulaCelulaDoTabuleiro, linhaLinhaDoTabuleiro, templateCelulaDoTabuleiro) {
+			if (celula.ocupada()) {
+				celulaCelulaDoTabuleiro.classList.add(celula.ocupante.identificador);
+			}
+			linhaLinhaDoTabuleiro.appendChild(templateCelulaDoTabuleiro.cloneNode(true));
+			if (celula.ocupada()) {
+				celulaCelulaDoTabuleiro.classList.remove(celula.ocupante.identificador);
+			}
 		},
 
 		observarJogadores: function () {
@@ -98,6 +99,13 @@
 		atualizarNodos: function (minimax, propriedade) {
 			var nodos = Linda.selecionar(String.formatar("section.estatisticas > dl > dd.%@", propriedade));
 			nodos.textContent = minimax[propriedade];
+		},
+
+		atualizarContagemDosNodos: function () {
+			Linda.selecionar("section.estatisticas > dl > dd.nodosConstruidos").textContent = Minimax.nodosConstruidos;
+			Linda.selecionar("section.estatisticas > dl > dd.nodosProcessados").textContent = Minimax.nodosProcessados;
+			Linda.selecionar("section.estatisticas > dl > dd.totalDeNodosConstruidos").textContent = Minimax.totalDeNodosConstruidos;
+			Linda.selecionar("section.estatisticas > dl > dd.totalDeNodosProcessados").textContent = Minimax.totalDeNodosProcessados;
 		},
 
 		atualizarCelula: function (celula) {

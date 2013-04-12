@@ -40,6 +40,25 @@
 
 		iniciarIa: function () {
 			Linda.selecionar("section.configuracoes button.iniciarIa").disabled = true;
+			EstrategiaNodo.fixarEstrategia(this.obterEstrategia());
+			Ligue4Ia.instancia.profundidade = this.obterProfundidade();
+			Ligue4Ia.instancia.construirArvore = this.obterConstruirArvore();
+			Ligue4Ia.instancia.receberJogada(Ligue4Modelo.instancia.ordemDeJogadores);
+		},
+
+		obterConstruirArvore: function () {
+		var construirArvore = false;
+			if (Linda.obterPeloNome("construirArvore").checked) {
+				construirArvore = true;
+			}
+			return construirArvore;
+		},
+
+		obterProfundidade: function() {
+			return Linda.obterPeloNome("profundidade").value.paraInteiro();
+		},
+
+		obterEstrategia: function () {
 			var estrategias = Linda.obterTodosPeloNome("estrategiaMinimax");
 			var estrategiaEscolhida;
 			for (var indice = 0, tamanho = estrategias.length; indice < tamanho; indice++) {
@@ -48,22 +67,14 @@
 					estrategiaEscolhida = estrategiaAtual;
 				}
 			}
-			var profundidade = Linda.obterPeloNome("profundidade").value.paraInteiro();
-			var construirArvore = false;
-			if (Linda.obterPeloNome("construirArvore").checked) {
-				construirArvore = true;
-			}
 			estrategiaEscolhida = estrategiaEscolhida.value;
 			if (estrategiaEscolhida === "minimax") {
-				EstrategiaNodo.fixarEstrategia(Nodo);
+				return Nodo;
 			} else if (estrategiaEscolhida === "minimaxComHeuristica") {
-				EstrategiaNodo.fixarEstrategia(NodoComHeuristica);
+				return NodoComHeuristica;
 			} else if (estrategiaEscolhida === "minimaxComHeuristicaComPoda") {
-				EstrategiaNodo.fixarEstrategia(NodoComHeuristicaComPoda);
+				return NodoComHeuristicaComPoda;
 			}
-			Ligue4Ia.instancia.profundidade = profundidade;
-			Ligue4Ia.instancia.construirArvore = construirArvore;
-			Ligue4Ia.instancia.receberJogada(Ligue4Modelo.instancia.ordemDeJogadores);
 		},
 
 		jogar: function (evento) {

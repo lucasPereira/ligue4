@@ -28,6 +28,7 @@
 
 		atualizarJogador: function (ordemDeJogadores) {
 			Ligue4Visao.instancia.atualizarJogadorDaVez(ordemDeJogadores);
+			Ligue4Visao.instancia.atualizarContagemDosNodos();
 			Linda.janela.setTimeout(function () {
 				Ligue4Ia.instancia.receberJogada(ordemDeJogadores);
 			}, 10);

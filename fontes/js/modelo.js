@@ -22,11 +22,7 @@
 			var jogadorDaVez = this.ordemDeJogadores.primeiro;
 			var jogadaRealizada = this.tabuleiro.receberJogada(coluna, jogadorDaVez);
 			if (jogadaRealizada) {
-				if (this.tabuleiro.possuiSequenciaVencedora()) {
-					Ligue4.instancia.declararVencedor(this.tabuleiro.fornecerSequenciasVencedoras());
-				} else if (this.tabuleiro.fimDeCelulas()) {
-					Ligue4.instancia.declararEmpate();
-				}
+				this.verificarFimDeJogo();
 				this.ordemDeJogadores.push(this.ordemDeJogadores.shift());
 				Ligue4.instancia.atualizarCelula(this.tabuleiro.ultimaJogada);
 				Ligue4.instancia.atualizarJogador(this.ordemDeJogadores);
@@ -34,6 +30,14 @@
 				Ligue4.instancia.declararColunaCheia();
 			}
 			return jogadaRealizada;
+		},
+
+		verificarFimDeJogo: function () {
+			if (this.tabuleiro.possuiSequenciaVencedora()) {
+				Ligue4.instancia.declararVencedor(this.tabuleiro.fornecerSequenciasVencedoras());
+			} else if (this.tabuleiro.fimDeCelulas()) {
+				Ligue4.instancia.declararEmpate();
+			}
 		},
 
 		jogarHumano: function (coluna) {
