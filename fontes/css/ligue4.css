@@ -64,9 +64,18 @@ table.tabuleiro tr td.computador {
 	color: #FFF;
 }
 
-ul.jogadores {
+section.informacoesDoJogo {
+	display: -webkit-flex;
+	-webkit-flex-direction: column;
+	-webkit-flex-wrap: nowrap;
+	-webkit-align-items: flex-start;
+	-webkit-justify-content: flex-start;
 	margin-left: 30px;
-	width: 100px;
+	width: 250px;
+}
+
+ul.jogadores {
+	margin-bottom: 40px;
 }
 
 ul.jogadores > li.humano {

@@ -28,31 +28,33 @@
 					</tr>
 				</template>
 			</table>
-			<ul class="jogadores">
-				<li class="humano">Humano</li>
-				<li class="computador">Computador</li>
-			</ul>
+			<section class="informacoesDoJogo">
+				<ul class="jogadores">
+					<li class="humano">Humano</li>
+					<li class="computador">Computador</li>
+				</ul>
+				<p class="ultimaJogada">Última jogada: <span class="ultimaJogada">nenhuma</span>.</p>
+			</section>
 		</section>
 		<section class="estatisticas">
 			<dl>
-				<dt>Nodos construídos</dt>
-				<dd class="nodosConstruidos"></dd>
 				<dt>Nodos processados</dt>
 				<dd class="nodosProcessados"></dd>
-				<dt>Total de nodos construídos</dt>
-				<dd class="totalDeNodosConstruidos"></dd>
+				<dt>Nodos folhas processados</dt>
+				<dd class="nodosFolhasProcessados"></dd>
 				<dt>Total de nodos processados</dd>
 				<dd class="totalDeNodosProcessados"></dd>
+				<dt>Total de nodos folhas processados</dt>
+				<dd class="totalDeNodosFolhasProcessados"></dd>
 			</dl>
 		</section>
 		<section class="configuracoes">
 			<div>
 				<label><input name="estrategiaMinimax" value="minimax" checked type="radio" />Minimax</label>
-				<label><input name="estrategiaMinimax" value="minimaxComHeuristica" type="radio" />Minimax com heuristica</label>
-				<label><input name="estrategiaMinimax" value="minimaxComHeuristicaComPoda" type="radio" />Minimax com heuristica e poda</label>
+				<label><input name="estrategiaMinimax" value="minimaxComPoda" type="radio" />Minimax com poda</label>
+				<label><input name="estrategiaMinimax" value="minimaxComHeuristica" type="radio" />Minimax com heuristica e poda</label>
 			</div>
 			<label>Profundidade: <input name="profundidade" type="text" value="4" /></label>
-			<label><input name="construirArvore" type="checkbox" />Construir árvore</label>
 			<label><button type="button" class="iniciarIa">Iniciar IA</button>
 		</section>
 		<section class="arvore">

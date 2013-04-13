@@ -347,7 +347,7 @@
 	Array.implementar({
 		clonar: function () {
 			var clone = new Array(this.length);
-			for (var indice = 0, tamanho = this.length; indice < tamanho; indice++) {
+			for (var indice = 0; indice < this.length; indice++) {
 				var elemento = this[indice];
 				if (Linda.tipoDe(elemento.clonar, Function)) {
 					elemento = elemento.clonar();
@@ -362,8 +362,8 @@
 		},
 
 		embaralhar: function () {
-			for (var indice = 0, tamanho = this.length - 1; indice <= tamanho; indice++) {
-				var novoIndice = Number.sortearInteiro(0, tamanho);
+			for (var indice = 0; indice < this.length; indice++) {
+				var novoIndice = Number.sortearInteiro(0, this.length - 1);
 				var valorSalvo = this[indice];
 				this[indice] = this[novoIndice];
 				this[novoIndice] = valorSalvo;
@@ -384,7 +384,7 @@
 
 		paraCada: function (funcaoDeIteracao, escopo) {
 			funcaoDeIteracao = funcaoDeIteracao.vincularEscopo(escopo);
-			for (var indice = 0, tamanho = this.length; indice < tamanho; indice++) {
+			for (var indice = 0; indice < this.length; indice++) {
 				funcaoDeIteracao(this[indice], indice);
 			}
 		},
@@ -412,7 +412,7 @@
 		reduzir: function (funcaoDeReducao, valorAtual, escopo) {
 			funcaoDeReducao = funcaoDeReducao.vincularEscopo(escopo);
 			valorAtual = valorAtual || 0;
-			for (var indice = 0, tamanho = this.length; indice < tamanho; indice++) {
+			for (var indice = 0; indice < this.length; indice++) {
 				valorAtual = funcaoDeReducao(valorAtual, this[indice], indice);
 			}
 			return valorAtual;
@@ -421,7 +421,7 @@
 		reduzirSemPrimeiro: function (funcaoDeReducao, valorAtual, escopo) {
 			funcaoDeReducao = funcaoDeReducao.vincularEscopo(escopo);
 			valorAtual = valorAtual || 0;
-			for (var indice = 1, tamanho = this.length; indice < tamanho; indice++) {
+			for (var indice = 1; indice < this.length; indice++) {
 				valorAtual = funcaoDeReducao(valorAtual, this[indice], indice);
 			}
 			return valorAtual;
@@ -430,7 +430,7 @@
 		reduzirSemUltimo: function (funcaoDeReducao, valorAtual, escopo) {
 			funcaoDeReducao = funcaoDeReducao.vincularEscopo(escopo);
 			valorAtual = valorAtual || 0;
-			for (var indice = 0, tamanho = (this.length - 1); indice < tamanho; indice++) {
+			for (var indice = 0; indice < (this.length - 1); indice++) {
 				valorAtual = funcaoDeReducao(valorAtual, this[indice], indice);
 			}
 			return valorAtual;

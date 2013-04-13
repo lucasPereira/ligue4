@@ -1,190 +1,127 @@
 /*global Classe*/
 /*global Ligue4Modelo*/
-/*global Ligue4Visao*/
 
 (function (global) {
 	"use strict";
 
 	var Ligue4Ia = Classe.criarSingleton({
 		inicializar: function () {
-			EstrategiaNodo.fixarEstrategia(Nodo);
-			Minimax.fixarVencedorDesejado(Ligue4Modelo.instancia.jogadores.computador);
+			EstrategiaMinimax.fixarEstrategia(Minimax);
+			EstrategiaMinimax.fixarVencedorDesejado(Ligue4Modelo.instancia.jogadores.computador);
 			this.construirArvore = false;
 			this.profundidade = 4;
 		},
 
 		receberJogada: function (ordemDeJogadores) {
-			if (ordemDeJogadores.primeiro.igual(Minimax.vencedorDesejado)) {
-				Minimax.reiniciarNodosConstruidosProcessados();
-				var tabuleiro = Ligue4Modelo.instancia.tabuleiro.clonar();
-				var minimax = new Minimax(tabuleiro, ordemDeJogadores);
-				minimax.construirArvore(ordemDeJogadores, this.profundidade);
+			if (ordemDeJogadores.primeiro.igual(EstrategiaMinimax.vencedorDesejado)) {
+				EstrategiaMinimax.reiniciarNodosProcessados();
+				var tabuleiro = Ligue4Modelo.instancia.tabuleiro;
+				var minimax = new Minimax(tabuleiro, ordemDeJogadores, this.profundidade);
 				var jogada = minimax.jogar();
-				Ligue4Modelo.instancia.jogarComputador(jogada.coluna);
-				if (this.construirArvore) {
-					Ligue4Visao.instancia.construirArvoreMinimax(minimax);
-				}
+				Ligue4Modelo.instancia.jogarComputador(jogada);
 			}
 		}
 	});
 
 	var Minimax = Classe.criar({
-		inicializar: function (tabuleiro, ordemDeJogadores) {
-			this.raiz = new EstrategiaNodo(tabuleiro, ordemDeJogadores.ultimo);
-			this.nodoAtual = this.raiz;
+		inicializar: function (tabuleiro, ordemDeJogadores, profundidadeMaxima) {
+			this.profundidadeMaxima = profundidadeMaxima;
+			this.maximo = this.calcularMaximo(new Nodo(Number.menosInfinito), new Nodo(Number.maisInfinito), tabuleiro, ordemDeJogadores, 1);
 		},
 
-		construirArvore: function (ordemDeJogadores, profundidade) {
-			this.raiz.construirSubArvore(ordemDeJogadores, profundidade);
-			this.raiz.calcularMaximo();
-		},
-
-		jogar: function () {
-			var proximoPasso = this.nodoAtual.nodoAlfa;
-			var jogada = proximoPasso.tabuleiro.ultimaJogada;
-			this.receberJogada(jogada);
-			return jogada;
-		},
-
-		receberJogada: function (celula) {
-			this.nodoAtual = this.nodoAtual.fornecerProximoPasso(celula);
-		}
-	});
-
-	Minimax.estender({
-		nodosConstruidos: 0,
-		nodosProcessados: 0,
-		totalDeNodosConstruidos: 0,
-		totalDeNodosProcessados: 0,
-		vencedorDesejado: null,
-
-		fixarVencedorDesejado: function (vencedorDesejado) {
-			this.vencedorDesejado = vencedorDesejado;
-		},
-
-		reiniciarNodosConstruidosProcessados: function () {
-			this.nodosConstruidos = 0;
-			this.nodosProcessados = 0;
-		}
-	});
-
-	var EstrategiaNodo = Classe.criar({});
-
-	EstrategiaNodo.estender({
-		fixarEstrategia: function (Estrategia) {
-			this.implementar(Estrategia.prototype);
-		}
-	});
-
-	var Nodo = Classe.criar({
-		inicializar: function (tabuleiro, jogador) {
-			this.alfa = Number.menosInfinito;
-			this.beta = Number.maisInfinito;
-			this.nodoAlfa = null;
-			this.nodoBeta = null;
-			this.tabuleiro = tabuleiro;
-			this.jogador = jogador;
-			this.filhos = [];
-			this.profundidade = 0;
-			Minimax.totalDeNodosConstruidos++;
-			Minimax.nodosConstruidos++;
-		},
-
-		construirSubArvore: function (ordemDeJogadores, profundidade) {
-			if (profundidade > 0) {
-				var jogadasPossiveis = this.tabuleiro.fornecerJogadasPossiveis();
-				var novaOrdemDeJogadores = ordemDeJogadores.clonar();
-				var jogadorDaVez = ordemDeJogadores.primeiro;
-				var novaProfundidade = (profundidade - 1);
-				this.profundidade = profundidade;
-				novaOrdemDeJogadores.push(novaOrdemDeJogadores.shift());
-				jogadasPossiveis.paraCada(function (celula) {
-					var tabuleiroClone = this.tabuleiro.clonar();
-					tabuleiroClone.receberJogada(celula.coluna, jogadorDaVez);
-					var nodoFilho = new EstrategiaNodo(tabuleiroClone, jogadorDaVez);
-					this.adicionarFilho(nodoFilho);
-					nodoFilho.construirSubArvore(novaOrdemDeJogadores, novaProfundidade);
-				}, this);
+		calcularMaximo: function (alfa, beta, tabuleiro, ordemDeJogadores, profundidade) {
+			EstrategiaMinimax.processarNodo();
+			var jogadasPossiveis = tabuleiro.fornecerJogadasPossiveis();
+			if (profundidade >= this.profundidadeMaxima || jogadasPossiveis.vazio()) {
+				EstrategiaMinimax.processarNodoFolha();
+				return new Nodo(this.calcularPontuacao(tabuleiro, profundidade), tabuleiro.ultimaJogada);
 			}
-		},
-
-		calcularMinimo: function () {
-			Minimax.nodosProcessados++;
-			Minimax.totalDeNodosProcessados++;
-			if (this.nodoFolha()) {
-				this.beta = this.calcularPontuacao();
-				return this.beta;
+			var novaOrdemDeJogadores = ordemDeJogadores.clonar();
+			var novaProfundidade = (profundidade + 1);
+			novaOrdemDeJogadores.push(novaOrdemDeJogadores.shift());
+			for (var indice = 0, tamanho = jogadasPossiveis.length; indice < tamanho; indice++) {
+				var novoTabuleiro = tabuleiro.clonar();
+				var jogada = jogadasPossiveis[indice];
+				novoTabuleiro.receberJogada(jogada.coluna, novaOrdemDeJogadores.ultimo);
+				var minimo = this.calcularMinimo(alfa, beta, novoTabuleiro, novaOrdemDeJogadores, novaProfundidade);
+				if (minimo.maiorQue(alfa)) {
+					alfa = minimo;
+					alfa.fixarJogadaMaxima(jogada);
+				}
+				if (this.podar(alfa, beta)) {
+					return alfa;
+				}
 			}
-			var primeiroFilho = this.filhos.primeiro;
-			primeiroFilho.calcularMaximo();
-			this.nodoBeta = this.filhos.reduzirSemPrimeiro(function (nodoEscolhido, nodoAtual) {
-				return (nodoAtual.calcularMaximo() < nodoEscolhido.alfa) ? nodoAtual : nodoEscolhido;
-			}, primeiroFilho, this);
-			this.beta = this.nodoBeta.alfa;
-			return this.beta;
+			return alfa;
 		},
 
-		calcularMaximo: function () {
-			Minimax.nodosProcessados++;
-			Minimax.totalDeNodosProcessados++;
-			if (this.nodoFolha()) {
-				this.alfa = this.calcularPontuacao();
-				return this.alfa;
+		calcularMinimo: function (alfa, beta, tabuleiro, ordemDeJogadores, profundidade) {
+			EstrategiaMinimax.processarNodo();
+			var jogadasPossiveis = tabuleiro.fornecerJogadasPossiveis();
+			if (profundidade >= this.profundidadeMaxima || jogadasPossiveis.vazio()) {
+				EstrategiaMinimax.processarNodoFolha();
+				return new Nodo(this.calcularPontuacao(tabuleiro, profundidade), tabuleiro.ultimaJogada);
 			}
-			var primeiroFilho = this.filhos.primeiro;
-			primeiroFilho.calcularMinimo();
-			this.nodoAlfa = this.filhos.reduzirSemPrimeiro(function (nodoEscolhido, nodoAtual) {
-				return (nodoAtual.calcularMinimo() > nodoEscolhido.beta) ? nodoAtual : nodoEscolhido;
-			}, primeiroFilho, this);
-			this.alfa = this.nodoAlfa.beta;
-			return this.alfa;
+			var novaOrdemDeJogadores = ordemDeJogadores.clonar();
+			var novaProfundidade = (profundidade + 1);
+			novaOrdemDeJogadores.push(novaOrdemDeJogadores.shift());
+			for (var indice = 0, tamanho = jogadasPossiveis.length; indice < tamanho; indice++) {
+				var novoTabuleiro = tabuleiro.clonar();
+				novoTabuleiro.receberJogada(jogadasPossiveis[indice].coluna, novaOrdemDeJogadores.ultimo);
+				var maximo = this.calcularMaximo(alfa, beta, novoTabuleiro, novaOrdemDeJogadores, novaProfundidade);
+				if (maximo.menorQue(beta)) {
+					beta = maximo;
+				}
+				if (this.podar(alfa, beta)) {
+					return beta;
+				}
+			}
+			return beta;
 		},
 
-		calcularPontuacao: function () {
-			return this.calcularFuncaoDeUtilidade();
+		calcularPontuacao: function (tabuleiro, profundidade) {
+			return this.calcularFuncaoDeUtilidade(tabuleiro, profundidade);
 		},
 
-		calcularFuncaoDeUtilidade: function () {
-			if (this.tabuleiro.possuiSequenciaVencedora()) {
-				var profundiadeMaxima = 42;
-				var computadorVenceu = this.tabuleiro.fornecerSequenciasVencedoras().primeiro.primeiro.ocupanteIgual(Minimax.vencedorDesejado);
-				return ((profundiadeMaxima - this.profundidade) * ((computadorVenceu) ? 1 : -1));
+		calcularFuncaoDeUtilidade: function (tabuleiro, profundidade) {
+			if (tabuleiro.possuiSequenciaVencedora()) {
+				var jogadorDesejadoVenceu = tabuleiro.fornecerSequenciasVencedoras().primeiro.primeiro.ocupanteIgual(EstrategiaMinimax.vencedorDesejado);
+				return ((this.profundidadeMaxima - profundidade + 1) * ((jogadorDesejadoVenceu) ? 1 : -1));
 			} else {
 				return 0;
 			}
 		},
 
-		adicionarFilho: function (nodo) {
-			this.filhos.push(nodo);
+		podar: function () {
+			return false;
 		},
 
-		fornecerProximoPasso: function (jogada) {
-			var proximoPasso = null;
-			this.filhos.paraCada(function (nodoFilho) {
-				if (nodoFilho.tabuleiro.ultimaJogadaFoi(jogada)) {
-					proximoPasso = nodoFilho;
-					return;
-				}
-			});
-			return proximoPasso;
-		},
-
-		nodoFolha: function () {
-			return this.filhos.vazio();
+		jogar: function () {
+			return this.maximo.jogadaMaxima.coluna;
 		}
 	});
 
-	var NodoComHeuristicaComPoda = Classe.criar({});
+	var MinimaxComPoda = Classe.criar({
+		estende: Minimax,
 
-	var NodoComHeuristica = Classe.criar({
-		estende: Nodo,
-
-		inicializar: function (tabuleiro, jogador) {
-			Nodo.prototipo.inicializar.chamarComEscopo(this, tabuleiro, jogador);
+		inicializar: function (tabuleiro, ordemDeJogadores, profundidade) {
+			Minimax.prototipo.inicializar.chamarComEscopo(this, tabuleiro, ordemDeJogadores, profundidade);
 		},
 
-		calcularPontuacao: function () {
-			return (this.calcularFuncaoDeUtilidade() + this.calcularHeuristica);
+		podar: function (alfa, beta) {
+			return (alfa.maiorOuIgualQue(beta));
+		}
+	});
+
+	var MinimaxComHeuristica = Classe.criar({
+		estende: MinimaxComPoda,
+
+		inicializar: function (tabuleiro, ordemDeJogadores, profundidade) {
+			MinimaxComPoda.prototipo.inicializar.chamarComEscopo(this, tabuleiro, ordemDeJogadores, profundidade);
+		},
+
+		calcularPontuacao: function (tabuleiro, profundidade) {
+			return this.calcularFuncaoDeUtilidade(tabuleiro, profundidade);
 		},
 
 		calcularHeuristica: function () {
@@ -203,9 +140,65 @@
 		}
 	});
 
-	global.EstrategiaNodo = EstrategiaNodo;
+	var EstrategiaMinimax = Classe.criar({});
+
+	EstrategiaMinimax.estender({
+		nodosFolhasProcessados: 0,
+		nodosProcessados: 0,
+		totalDeNodosFolhasProcessados: 0,
+		totalDeNodosProcessados: 0,
+		vencedorDesejado: null,
+
+		fixarEstrategia: function (estrategia) {
+			this.implementar(estrategia.prototipo);
+		},
+
+		fixarVencedorDesejado: function (vencedorDesejado) {
+			this.vencedorDesejado = vencedorDesejado;
+		},
+
+		reiniciarNodosProcessados: function () {
+			this.nodosFolhasProcessados = 0;
+			this.nodosProcessados = 0;
+		},
+
+		processarNodo: function () {
+			this.nodosProcessados++;
+			this.totalDeNodosProcessados++;
+		},
+
+		processarNodoFolha: function () {
+			this.nodosFolhasProcessados++;
+			this.totalDeNodosFolhasProcessados++;
+		}
+	});
+
+	var Nodo = Classe.criar({
+		inicializar: function (pontuacao, jogada) {
+			this.pontuacao = pontuacao;
+			this.jogada = jogada;
+		},
+
+		maiorQue: function (outro) {
+			return (this.pontuacao > outro.pontuacao);
+		},
+
+		menorQue: function (outro) {
+			return (this.pontuacao < outro.pontuacao);
+		},
+
+		maiorOuIgualQue: function (outro) {
+			return (this.pontuacao >= outro.pontuacao);
+		},
+
+		fixarJogadaMaxima: function (jogadaMaxima) {
+			this.jogadaMaxima = jogadaMaxima;
+		}
+	});
+
+	global.EstrategiaMinimax = EstrategiaMinimax;
 	global.Ligue4Ia = Ligue4Ia;
 	global.Minimax = Minimax;
-	global.Nodo = Nodo;
-	global.NodoComHeuristica = NodoComHeuristica;
+	global.MinimaxComPoda = MinimaxComPoda;
+	global.MinimaxComHeuristica = MinimaxComHeuristica;
 }(this));

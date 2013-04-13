@@ -66,7 +66,7 @@ construir() {
 testar() {
 	construir;
 	echo ":testar";
-	chromium-browser `find ${binariosHtml} -name teste*.html` --allow-file-access-from-files;
+	google-chrome `find ${binariosHtml} -name teste*.html` --allow-file-access-from-files;
 }
 
 depurar() {
