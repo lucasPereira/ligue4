@@ -71,7 +71,7 @@ section.informacoesDoJogo {
 	-webkit-align-items: flex-start;
 	-webkit-justify-content: flex-start;
 	margin-left: 30px;
-	width: 250px;
+	width: 400px;
 }
 
 ul.jogadores {
@@ -136,18 +136,17 @@ section.arvore > div.nodo {
 }
 
 section.estatisticas {
-	margin: 50px;
+	margin-top: 40px;
+	display: -webkit-flex;
+	-webkit-flex-direction: column;
+	-webkit-flex-wrap: nowrap;
+	-webkit-align-items: stretch;
+	-webkit-justify-content: center;
 }
 
-section.estatisticas > dl > dt {
-	font-weight: bold;
-	display: inline-block;
-}
-
-section.estatisticas > dl > dd { 
-	display: inline-block;
-	margin-right: 30px;
-	margin-left: 5px;
+section.estatisticas > ul > li > span,
+section.informacoesDoJogo > p > span {
+	color: #C32;
 }
 
 input[type="text"] {
@@ -170,13 +169,12 @@ label > input {
 }
 
 section.configuracoes {
-	margin: 50px;
+	margin: 40px;
 	display: -webkit-flex;
 	-webkit-flex-direction: row;
 	-webkit-flex-wrap: wrap;
-	-webkit-justify-content: flex-start;
-	-webkit-align-items: flex-start;
-	-webkit-align-content: flex-start;
+	-webkit-justify-content: center;
+	-webkit-align-items: center;
 }
 
 button {

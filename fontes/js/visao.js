@@ -29,10 +29,12 @@
 		},
 
 		atualizarContagemDosNodos: function () {
-			Linda.selecionar("section.estatisticas > dl > dd.nodosProcessados").textContent = EstrategiaMinimax.nodosProcessados;
-			Linda.selecionar("section.estatisticas > dl > dd.nodosFolhasProcessados").textContent = EstrategiaMinimax.nodosFolhasProcessados;
-			Linda.selecionar("section.estatisticas > dl > dd.totalDeNodosProcessados").textContent = EstrategiaMinimax.totalDeNodosProcessados;
-			Linda.selecionar("section.estatisticas > dl > dd.totalDeNodosFolhasProcessados").textContent = EstrategiaMinimax.totalDeNodosFolhasProcessados;
+			Linda.selecionar("section.estatisticas > ul > li > span.nodosProcessados").textContent = EstrategiaMinimax.nodosProcessados;
+			Linda.selecionar("section.estatisticas > ul > li > span.nodosFolhasProcessados").textContent = EstrategiaMinimax.nodosFolhasProcessados;
+			Linda.selecionar("section.estatisticas > ul > li > span.nodosPodados").textContent = EstrategiaMinimax.nodosPodados;
+			Linda.selecionar("section.estatisticas > ul > li > span.totalDeNodosProcessados").textContent = EstrategiaMinimax.totalDeNodosProcessados;
+			Linda.selecionar("section.estatisticas > ul > li > span.totalDeNodosFolhasProcessados").textContent = EstrategiaMinimax.totalDeNodosFolhasProcessados;
+			Linda.selecionar("section.estatisticas > ul > li > span.totalDeNodosPodados").textContent = EstrategiaMinimax.totalDeNodosPodados;
 		},
 
 		atualizarCelula: function (celula) {

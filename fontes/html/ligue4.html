@@ -34,27 +34,25 @@
 					<li class="computador">Computador</li>
 				</ul>
 				<p class="ultimaJogada">Última jogada: <span class="ultimaJogada">nenhuma</span>.</p>
+				<section class="estatisticas">
+					<ul>
+						<li>Nodos processados: <span class="nodosProcessados">0</li>
+						<li>Nodos podados: <span class="nodosPodados">0</span></li>
+						<li>Nodos folhas processados: <span class="nodosFolhasProcessados">0</span></li>
+						<li>Total de nodos processados: <span class="totalDeNodosProcessados">0</span></li>
+						<li>Total de nodos podados: <span class="totalDeNodosPodados">0</span></li>
+						<li>Total de nodos folhas processados: <span class="totalDeNodosFolhasProcessados">0</span></li>
+					</dl>
+				</section>
 			</section>
-		</section>
-		<section class="estatisticas">
-			<dl>
-				<dt>Nodos processados</dt>
-				<dd class="nodosProcessados"></dd>
-				<dt>Nodos folhas processados</dt>
-				<dd class="nodosFolhasProcessados"></dd>
-				<dt>Total de nodos processados</dd>
-				<dd class="totalDeNodosProcessados"></dd>
-				<dt>Total de nodos folhas processados</dt>
-				<dd class="totalDeNodosFolhasProcessados"></dd>
-			</dl>
 		</section>
 		<section class="configuracoes">
 			<div>
-				<label><input name="estrategiaMinimax" value="minimax" checked type="radio" />Minimax</label>
+				<label><input name="estrategiaMinimax" value="minimax" type="radio" />Minimax</label>
 				<label><input name="estrategiaMinimax" value="minimaxComPoda" type="radio" />Minimax com poda</label>
-				<label><input name="estrategiaMinimax" value="minimaxComHeuristica" type="radio" />Minimax com heuristica e poda</label>
+				<label><input name="estrategiaMinimax" value="minimaxComHeuristica" checked type="radio" />Minimax com heuristica e poda</label>
 			</div>
-			<label>Profundidade: <input name="profundidade" type="text" value="4" /></label>
+			<label>Profundidade: <input name="profundidade" type="text" value="9" /></label>
 			<label><button type="button" class="iniciarIa">Iniciar IA</button>
 		</section>
 		<section class="arvore">
