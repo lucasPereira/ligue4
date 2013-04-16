@@ -5,7 +5,9 @@
 /*global Ligue4Visao*/
 /*global Linda*/
 /*global Minimax*/
-/*global MinimaxComHeuristica*/
+/*global MinimaxComHeuristicaA*/
+/*global MinimaxComHeuristicaB*/
+/*global MinimaxComHeuristicaC*/
 /*global MinimaxComPoda*/
 
 (function (global) {
@@ -63,8 +65,12 @@
 				return Minimax;
 			} else if (estrategiaEscolhida === "minimaxComPoda") {
 				return MinimaxComPoda;
-			} else if (estrategiaEscolhida === "minimaxComHeuristica") {
-				return MinimaxComHeuristica;
+			} else if (estrategiaEscolhida === "minimaxComHeuristicaA") {
+				return MinimaxComHeuristicaA;
+			} else if (estrategiaEscolhida === "minimaxComHeuristicaB") {
+				return MinimaxComHeuristicaB;
+			} else if (estrategiaEscolhida === "minimaxComHeuristicaC") {
+				return MinimaxComHeuristicaC;
 			}
 		},
 

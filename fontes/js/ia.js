@@ -6,8 +6,9 @@
 
 	var Ligue4Ia = Classe.criarSingleton({
 		inicializar: function () {
-			EstrategiaMinimax.fixarEstrategia(MinimaxComHeuristica);
+			EstrategiaMinimax.fixarEstrategia(MinimaxComHeuristicaA);
 			EstrategiaMinimax.fixarVencedorDesejado(Ligue4Modelo.instancia.jogadores.computador);
+			EstrategiaMinimax.fixarPerdedorDesejado(Ligue4Modelo.instancia.jogadores.humano);
 			this.profundidade = 9;
 		},
 
@@ -116,14 +117,13 @@
 			return Number.menosInfinito;
 		},
 
-		ordenarJogadasPelaHeuristica: function(jogadas, jogador) {
+		ordenarJogadasPelaHeuristica: function(jogadas) {
 			return jogadas.sort(this.ordenarJogadaPelaHeuristica.vincularEscopo(this));
 		},
 
 		ordenarJogadaPelaHeuristica: function (jogadaA, jogadaB) {
-			var jogador = EstrategiaMinimax.vencedorDesejado;
-			var heuristicaA = this.calcularHeuristica(jogadaA, jogador);
-			var heuristicaB = this.calcularHeuristica(jogadaB, jogador);
+			var heuristicaA = this.calcularHeuristica(jogadaA);
+			var heuristicaB = this.calcularHeuristica(jogadaB);
 			if (heuristicaA > heuristicaB) {
 				return -1;
 			}
@@ -167,7 +167,7 @@
 			for (var indiceDaSequenciaDeVitoria = 0, tamanhoDasSequenciasDeVitoria = sequenciasDeVitoria.length; indiceDaSequenciaDeVitoria < tamanhoDasSequenciasDeVitoria; indiceDaSequenciaDeVitoria++) {
 				var heuristicaDaSequenciaDeVitoria = 1;
 				var sequenciaDeVitoria = sequenciasDeVitoria[indiceDaSequenciaDeVitoria];
-				for (var indiceDaCelula, tamanhoDaSequenciaDeVitoria = sequenciaDeVitoria.length; indiceDaCelula < tamanhoDaSequenciaDeVitoria; indiceDaCelula++) {
+				for (var indiceDaCelula = 0, tamanhoDaSequenciaDeVitoria = sequenciaDeVitoria.length; indiceDaCelula < tamanhoDaSequenciaDeVitoria; indiceDaCelula++) {
 					if (sequenciaDeVitoria[indiceDaCelula].ocupada()) {
 						heuristicaDaSequenciaDeVitoria++;
 					}
@@ -175,6 +175,44 @@
 				heuristica += heuristicaDaSequenciaDeVitoria;
 			}
 			return heuristica;
+		}
+	});
+
+	var MinimaxComHeuristicaA = Classe.criar({
+		estende: MinimaxComHeuristica,
+
+		inicializar: function (tabuleiro, ordemDeJogadores, profundidade) {
+			MinimaxComHeuristica.prototipo.inicializar.chamarComEscopo(this, tabuleiro, ordemDeJogadores, profundidade);
+		},
+
+		calcularHeuristica: function (jogada) {
+			return MinimaxComHeuristica.prototipo.calcularHeuristica.chamarComEscopo(this, jogada, EstrategiaMinimax.vencedorDesejado);
+		}
+	});
+
+	var MinimaxComHeuristicaB = Classe.criar({
+		estende: MinimaxComHeuristica,
+
+		inicializar: function (tabuleiro, ordemDeJogadores, profundidade) {
+			MinimaxComHeuristica.prototipo.inicializar.chamarComEscopo(this, tabuleiro, ordemDeJogadores, profundidade);
+		},
+
+		calcularHeuristica: function (jogada) {
+			return MinimaxComHeuristica.prototipo.calcularHeuristica.chamarComEscopo(this, jogada, EstrategiaMinimax.perdedorDesejado);
+		}
+	});
+
+	var MinimaxComHeuristicaC = Classe.criar({
+		estende: MinimaxComHeuristica,
+
+		inicializar: function (tabuleiro, ordemDeJogadores, profundidade) {
+			MinimaxComHeuristica.prototipo.inicializar.chamarComEscopo(this, tabuleiro, ordemDeJogadores, profundidade);
+		},
+
+		calcularHeuristica: function (jogada) {
+			var heuristicaA = MinimaxComHeuristica.prototipo.calcularHeuristica.chamarComEscopo(this, jogada, EstrategiaMinimax.vencedorDesejado);
+			var heuristicaB = MinimaxComHeuristica.prototipo.calcularHeuristica.chamarComEscopo(this, jogada, EstrategiaMinimax.perdedorDesejado);
+			return (heuristicaA + heuristicaB);
 		}
 	});
 
@@ -188,6 +226,7 @@
 		totalDeNodosProcessados: 0,
 		totalDeNodosPodados: 0,
 		vencedorDesejado: null,
+		perdedorDesejado: null,
 
 		fixarEstrategia: function (estrategia) {
 			this.prototype = estrategia.prototipo;
@@ -196,6 +235,10 @@
 
 		fixarVencedorDesejado: function (vencedorDesejado) {
 			this.vencedorDesejado = vencedorDesejado;
+		},
+
+		fixarPerdedorDesejado: function (perdedorDesejado) {
+			this.perdedorDesejado = perdedorDesejado;
 		},
 
 		reiniciarNodosProcessados: function () {
@@ -224,5 +267,7 @@
 	global.Ligue4Ia = Ligue4Ia;
 	global.Minimax = Minimax;
 	global.MinimaxComPoda = MinimaxComPoda;
-	global.MinimaxComHeuristica = MinimaxComHeuristica;
+	global.MinimaxComHeuristicaA = MinimaxComHeuristicaA;
+	global.MinimaxComHeuristicaB = MinimaxComHeuristicaB;
+	global.MinimaxComHeuristicaC = MinimaxComHeuristicaC;
 }(this));
